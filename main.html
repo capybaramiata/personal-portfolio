@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PORTFOLIO | MAX TIANYU WANG</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plaster&display=swap" rel="stylesheet">
+    <style>
+        /* Reset & Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden; /* No scrollbars */
+            background-color: #000;
+            font-family: 'Instrument Serif', serif;
+            overscroll-behavior: none; /* Prevents mobile pull-to-refresh */
+            cursor: none;
+        }
+
+        /* Container encapsulating the full viewport */
+        .reveal-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        /* Generic layer styling */
+        .layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none; /* Let events pass through to document */
+        }
+
+        /* Object-fit ensures images crop properly on mobile verticals */
+        .layer-img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+        }
+
+        .scroll-text-wrapper {
+            position: absolute;
+            top: 45%;
+            left: 0;
+            width: 100%;
+            height: 5.2rem;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .scroll-text-wrapper.reveal {
+            z-index: 1;
+        }
+
+        .scroll-text-track {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            display: inline-flex;
+            white-space: nowrap;
+            font-family: 'Plaster', serif;
+            font-size: 4rem;
+            font-weight: 700;
+            color: #000;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            transform: translate3d(-50%, -50%, 0);
+            will-change: transform;
+            animation: scrollRight 56s linear infinite;
+        }
+
+        .scroll-text-track.reveal {
+            color: #fff;
+        }
+
+        .scroll-text-item {
+            display: inline-block;
+        }
+
+        @keyframes scrollRight {
+            0% {
+                transform: translate3d(-50%, -50%, 0);
+            }
+            100% {
+                transform: translate3d(0, -50%, 0);
+            }
+        }
+
+        /* 
+         * Z-Index Architecture:
+         * 1. Base Layer (Bottom) 
+         */
+        .base-layer {
+            z-index: 1;
+        }
+        .base-layer .bg { z-index: 1; }
+        .base-layer .subject { z-index: 2; }
+
+        /* 
+         * 2. Reveal Layer (Middle) 
+         * This layer is completely hidden by default until the JS applies the mask.
+         */
+        .reveal-layer {
+            z-index: 2;
+            /* Initialize with empty mask */
+            -webkit-mask-image: radial-gradient(circle 0px at 50% 50%, transparent 100%);
+            mask-image: radial-gradient(circle 0px at 50% 50%, transparent 100%);
+            -webkit-mask-repeat: no-repeat;
+            mask-repeat: no-repeat;
+        }
+        
+        /* The visual filter: Darkens/contrasts the background inside the mask */
+        .reveal-layer .bg {
+            z-index: 1;
+            filter: brightness(0.4) contrast(1.3); 
+        }
+        .reveal-layer .subject { z-index: 2; }
+
+        /* 
+         * 3. UI Layer (Top) 
+         * Unaffected by the mask, remains visible on top.
+         */
+        .ui-layer {
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 40px;
+            color: #fff;
+            /* Text shadow only kept here for UI elements that might need it */
+            text-shadow: 0px 2px 10px rgba(0,0,0,0.5);
+            pointer-events: none;
+        }
+
+        #dark-mode-toggle {
+            transition: color 0.3s ease;
+            cursor: none;
+            pointer-events: auto;
+            display: flex;
+            align-items: center;
+        }
+
+        body.dark-mode #dark-mode-toggle {
+            color: #fff;
+        }
+
+        /* Dark Mode overrides */
+        body.dark-mode .base-layer .bg {
+            filter: brightness(0.25) contrast(1.2);
+        }
+
+        body.dark-mode .reveal-layer .bg {
+            filter: none;
+        }
+
+        body.dark-mode .scroll-text-track {
+            color: #fff;
+        }
+
+        body.dark-mode .scroll-text-track.reveal {
+            color: #000;
+        }
+
+        /* Nav Layering for Color Inversion */
+        .nav-container {
+            position: absolute;
+            top: 40px;
+            left: 40px;
+            right: 40px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            pointer-events: none;
+        }
+
+        .nav-container.base {
+            color: #000;
+            z-index: 3;
+        }
+
+        .nav-container.reveal {
+            color: #fff;
+            z-index: 1;
+        }
+
+        body.dark-mode .nav-container.base {
+            color: #fff;
+        }
+
+        body.dark-mode .nav-container.reveal {
+            color: #000;
+        }
+
+        .toggle-icon svg {
+            display: block;
+            width: 24px;
+            height: 24px;
+            stroke: currentColor;
+        }
+
+        /* Bottom UI Layering for Color Inversion */
+        .bottom-ui-container {
+            position: absolute;
+            bottom: 40px;
+            right: 40px;
+            text-align: right;
+            pointer-events: none;
+        }
+
+        .bottom-ui-container.base {
+            color: #000;
+            z-index: 3;
+        }
+
+        .bottom-ui-container.reveal {
+            color: #fff;
+            z-index: 1;
+        }
+
+        body.dark-mode .bottom-ui-container.base {
+            color: #fff;
+        }
+
+        body.dark-mode .bottom-ui-container.reveal {
+            color: #000;
+        }
+
+        .bottom-ui-container h1 {
+            font-size: 3rem;
+            line-height: 1.1;
+            font-weight: 500;
+        }
+
+        .bottom-ui-container p {
+            font-size: 1rem;
+            opacity: 0.8;
+            margin-top: 10px;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            pointer-events: none;
+            width: 100%;
+        }
+
+        nav > div {
+            pointer-events: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="reveal-container">
+        
+        <!-- BASE LAYER: Standard Background & Photo -->
+        <div class="layer base-layer">
+            <img src="IMG_0337.PNG" alt="Base Background" class="layer-img bg">
+            <div class="nav-container base">
+                <div>Max Tianyu Wang</div>
+                <div class="toggle-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+                </div>
+            </div>
+            
+            <div class="scroll-text-wrapper">
+                <div class="scroll-text-track">
+                    <span class="scroll-text-item">MAX WANG&nbsp;MAX WANG&nbsp;MAX WANG&nbsp;MAX WANG&nbsp;MAX WANG&nbsp;MAX WANG&nbsp;MAX WANG&nbsp;MAX WANG&nbsp;MAX WANG&nbsp;MAX WANG&nbsp;MAX WANG&nbsp;MAX WANG&nbsp;MAX WANG&nbsp;MAX WANG&nbsp;MAX WANG&nbsp;MAX WANG&nbsp;MAX WANG&nbsp;MAX WANG&nbsp;</span>
+                    <span class="scroll-text-item">MAX WANG&nbsp;MAX WANG&nbsp;MAX WANG&nbsp;MAX WANG&nbsp;MAX WANG&nbsp;MAX WANG&nbsp;MAX WANG&nbsp;MAX WANG&nbsp;MAX WANG&nbsp;MAX WANG&nbsp;MAX WANG&nbsp;MAX WANG&nbsp;MAX WANG&nbsp;MAX WANG&nbsp;MAX WANG&nbsp;MAX WANG&nbsp;MAX WANG&nbsp;MAX WANG&nbsp;</span>
+                </div>
+            </div>
+            
+            <div class="bottom-ui-container base">
+                <h1>Interactive<br>Reveal</h1>
+                <p>Move cursor to explore</p>
+            </div>
+
+            <img src="IMG_0336.PNG" alt="Static Photo" class="layer-img subject">
+        </div>
+
+        <!-- REVEAL LAYER: Darkened Background & Drawing -->
+        <div class="layer reveal-layer" id="revealLayer">
+            <img src="IMG_0337.PNG" alt="Darkened Background" class="layer-img bg">
+            <div class="nav-container reveal">
+                <div>Max Tianyu Wang</div>
+                <div class="toggle-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+                </div>
+            </div>
+            
+            <div class="scroll-text-wrapper reveal">
+                <div class="scroll-text-track reveal">
+                    <span class="scroll-text-item">MAX WANG&nbsp;MAX WANG&nbsp;MAX WANG&nbsp;MAX WANG&nbsp;MAX WANG&nbsp;MAX WANG&nbsp;MAX WANG&nbsp;MAX WANG&nbsp;MAX WANG&nbsp;MAX WANG&nbsp;MAX WANG&nbsp;MAX WANG&nbsp;MAX WANG&nbsp;MAX WANG&nbsp;MAX WANG&nbsp;MAX WANG&nbsp;MAX WANG&nbsp;MAX WANG&nbsp;</span>
+                    <span class="scroll-text-item">MAX WANG&nbsp;MAX WANG&nbsp;MAX WANG&nbsp;MAX WANG&nbsp;MAX WANG&nbsp;MAX WANG&nbsp;MAX WANG&nbsp;MAX WANG&nbsp;MAX WANG&nbsp;MAX WANG&nbsp;MAX WANG&nbsp;MAX WANG&nbsp;MAX WANG&nbsp;MAX WANG&nbsp;MAX WANG&nbsp;MAX WANG&nbsp;MAX WANG&nbsp;MAX WANG&nbsp;</span>
+                </div>
+            </div>
+
+            <div class="bottom-ui-container reveal">
+                <h1>Interactive<br>Reveal</h1>
+                <p>Move cursor to explore</p>
+            </div>
+
+            <img src="IMG_0335.PNG" alt="Revealed Drawing" class="layer-img subject">
+        </div>
+
+        <!-- UI LAYER: Navigation and Overlays -->
+        <div class="layer ui-layer">
+            <nav>
+                <div style="visibility: hidden;">Max Tianyu Wang</div>
+                <div id="dark-mode-toggle" style="width: 24px; height: 24px;"></div>
+            </nav>
+        </div>
+
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const revealLayer = document.getElementById("revealLayer");
+
+            // Configurable constraints
+            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 768;
+            const MAIN_RADIUS = isMobile ? 80 : 130;     // Smaller on mobile
+            const TRAIL_LENGTH = 15;     // Number of flutter trail circles
+            const LAG_FACTOR = 0.1;     // Lower = smoother/more lag, Higher = snappier
+
+            // Track target (mouse/touch) and current (animated) coordinates
+            let targetX = window.innerWidth / 2;
+            let targetY = window.innerHeight / 2;
+            let currentX = targetX;
+            let currentY = targetY;
+
+            let isDarkMode = false;
+            const toggle = document.getElementById("dark-mode-toggle");
+            const baseSubject = document.querySelector('.base-layer .subject');
+            const revealSubject = document.querySelector('.reveal-layer .subject');
+
+            const toggleDarkMode = () => {
+                isDarkMode = !isDarkMode;
+                document.body.classList.toggle('dark-mode', isDarkMode);
+                
+                if (isDarkMode) {
+                    baseSubject.src = "IMG_0335.PNG"; // Drawing
+                    revealSubject.src = "IMG_0336.PNG"; // Photo
+                } else {
+                    baseSubject.src = "IMG_0336.PNG"; // Photo
+                    revealSubject.src = "IMG_0335.PNG"; // Drawing
+                }
+            };
+
+            // Hitbox click logic: Button is pressed if the circle (at currentX, currentY) covers it
+            window.addEventListener("click", (e) => {
+                const rect = toggle.getBoundingClientRect();
+                const buttonX = rect.left + rect.width / 2;
+                const buttonY = rect.top + rect.height / 2;
+                
+                // Unified click check for both desktop and mobile using the circle distance
+                const dist = Math.sqrt(Math.pow(currentX - buttonX, 2) + Math.pow(currentY - buttonY, 2));
+                if (dist < MAIN_RADIUS) {
+                    toggleDarkMode();
+                }
+            });
+
+            // Array to hold the history of positions for the flutter trail
+            const trail = [];
+
+            // Event Listeners for Mouse and Touch
+            const updateTarget = (x, y) => {
+                targetX = x;
+                targetY = y;
+            };
+
+            window.addEventListener("mousemove", (e) => {
+                updateTarget(e.clientX, e.clientY);
+            });
+
+            window.addEventListener("touchmove", (e) => {
+                updateTarget(e.touches[0].clientX, e.touches[0].clientY);
+            }, { passive: true });
+
+            window.addEventListener("touchstart", (e) => {
+                updateTarget(e.touches[0].clientX, e.touches[0].clientY);
+                // Snap current to target on initial touch to prevent sliding from center
+                currentX = targetX;
+                currentY = targetY;
+            }, { passive: true });
+
+            // Linear interpolation function for smooth motion
+            const lerp = (start, end, factor) => start + (end - start) * factor;
+
+            // Main Animation Loop
+            function animate() {
+                // Smoothly move current position towards target position
+                currentX = lerp(currentX, targetX, LAG_FACTOR);
+                currentY = lerp(currentY, targetY, LAG_FACTOR);
+
+                // Add newest position to the front of the trail array
+                trail.unshift({ x: currentX, y: currentY });
+
+                // Keep the trail at the maximum specified length
+                if (trail.length > TRAIL_LENGTH) {
+                    trail.pop();
+                }
+
+                // Generate the complex mask string
+                const maskGradients = trail.map((point, index) => {
+                    // Calculate decay based on position in the trail array
+                    const progress = index / TRAIL_LENGTH;
+                    
+                    // Older points get smaller
+                    const size = MAIN_RADIUS * (1 - progress * 0.8); 
+                    
+                    // Older points fade out
+                    const opacity = 1 - Math.pow(progress, 2); 
+                    
+                    // Construct radial-gradient string for this specific trail point
+                    return `radial-gradient(circle ${size}px at ${point.x}px ${point.y}px, rgba(0, 0, 0, ${opacity}) 70%, transparent 100%)`;
+                });
+
+                // Combine all gradients. In CSS masks, multiple gradients composite on top of each other.
+                const maskString = maskGradients.join(", ");
+
+                // Apply the generated mask to the DOM element
+                revealLayer.style.webkitMaskImage = maskString;
+                revealLayer.style.maskImage = maskString;
+
+                // Request the next frame
+                requestAnimationFrame(animate);
+            }
+
+            // Kick off the animation loop
+            animate();
+        });
+    </script>
+</body>
+</html>
