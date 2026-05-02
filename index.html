@@ -21,36 +21,34 @@
         body, html {
             width: 100vw;
             height: 100vh;
-            overflow: hidden; /* No scrollbars */
+            overflow: hidden;
             background-color: #000;
             font-family: 'Instrument Serif', serif;
-            overscroll-behavior: none; /* Prevents mobile pull-to-refresh */
+            overscroll-behavior: none;
             cursor: none;
         }
 
-        /* Container encapsulating the full viewport */
         .reveal-container {
             position: relative;
             width: 100vw;
             height: 100vh;
         }
 
-        /* Generic layer styling */
         .layer {
             position: absolute;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
-            pointer-events: none; /* Let events pass through to document */
+            pointer-events: none;
         }
 
         /* Object-fit ensures images crop properly on mobile verticals */
         .layer-img {
             position: absolute;
-            top: -5%; /* Added buffer for parallax */
+            top: -5%;
             left: -5%;
-            width: 110%; /* Scaled up slightly to hide edges during parallax */
+            width: 110%;
             height: 110%;
             object-fit: cover;
             object-position: center;
@@ -100,12 +98,8 @@
         }
 
         @keyframes scrollRight {
-            0% {
-                transform: translate3d(-50%, -50%, 0);
-            }
-            100% {
-                transform: translate3d(0, -50%, 0);
-            }
+            0% { transform: translate3d(-50%, -50%, 0); }
+            100% { transform: translate3d(0, -50%, 0); }
         }
 
         /* Base Layer */
@@ -113,13 +107,15 @@
         .base-layer .bg { z-index: 1; }
         .base-layer .subject { z-index: 2; }
 
-        /* Reveal Layer */
+        /* Reveal Layer - Back to CSS String Masking */
         .reveal-layer {
             z-index: 2;
-            -webkit-mask-image: radial-gradient(circle 0px at 50% 50%, transparent 100%);
-            mask-image: radial-gradient(circle 0px at 50% 50%, transparent 100%);
+            -webkit-mask-image: none; /* Injected by JS */
+            mask-image: none;
             -webkit-mask-repeat: no-repeat;
             mask-repeat: no-repeat;
+            /* Hint browser to GPU accelerate the mask application */
+            will-change: mask-image, -webkit-mask-image; 
         }
         
         .reveal-layer .bg {
@@ -152,22 +148,10 @@
             color: #fff;
         }
 
-        /* Dark Mode overrides */
-        body.dark-mode .base-layer .bg {
-            filter: brightness(0.25) contrast(1.2);
-        }
-
-        body.dark-mode .reveal-layer .bg {
-            filter: none;
-        }
-
-        body.dark-mode .scroll-text-track {
-            color: #fff;
-        }
-
-        body.dark-mode .scroll-text-track.reveal {
-            color: #000;
-        }
+        body.dark-mode .base-layer .bg { filter: brightness(0.25) contrast(1.2); }
+        body.dark-mode .reveal-layer .bg { filter: none; }
+        body.dark-mode .scroll-text-track { color: #fff; }
+        body.dark-mode .scroll-text-track.reveal { color: #000; }
 
         /* Nav Layering */
         .nav-container {
@@ -210,17 +194,8 @@
         body.dark-mode .bottom-ui-container.base { color: #fff; }
         body.dark-mode .bottom-ui-container.reveal { color: #000; }
 
-        .bottom-ui-container h1 {
-            font-size: 3rem;
-            line-height: 1.1;
-            font-weight: 500;
-        }
-
-        .bottom-ui-container p {
-            font-size: 1rem;
-            opacity: 0.8;
-            margin-top: 10px;
-        }
+        .bottom-ui-container h1 { font-size: 3rem; line-height: 1.1; font-weight: 500; }
+        .bottom-ui-container p { font-size: 1rem; opacity: 0.8; margin-top: 10px; }
 
         nav {
             display: flex;
@@ -233,9 +208,7 @@
             width: 100%;
         }
 
-        nav > div {
-            pointer-events: auto;
-        }
+        nav > div { pointer-events: auto; }
     </style>
 </head>
 <body>
@@ -296,20 +269,19 @@
         document.addEventListener("DOMContentLoaded", () => {
             const revealLayer = document.getElementById("revealLayer");
 
-            // Configurable constraints
+            // Constraints optimized for parsing speed
             const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 768;
-            const MAIN_RADIUS = isMobile ? 60 : 100;     // Base radius
-            const TRAIL_LENGTH = 60;                     // Greatly increased for a longer return time
-            const LAG_FACTOR = 0.15;                     // Cursor tracking lag
+            const MAIN_RADIUS = isMobile ? 60 : 100;
+            const TRAIL_LENGTH = 40; // Reduced to baseline for performance
+            const LAG_FACTOR = 0.15;
             
-            // Track target (mouse) and current (animated) coordinates
             let targetX = window.innerWidth / 2;
             let targetY = window.innerHeight / 2;
             let currentX = targetX;
             let currentY = targetY;
-            let time = 0; // Used for swirl rotation
+            let time = 0;
+            let frameCount = 0; // Added for throttling
 
-            // Parallax State
             let paraTargetX = 0;
             let paraTargetY = 0;
             let paraCurrentX = 0;
@@ -342,7 +314,6 @@
                 const buttonX = rect.left + rect.width / 2;
                 const buttonY = rect.top + rect.height / 2;
                 
-                // Use targetX/Y for accurate click detection instead of the lagging currentX/Y
                 const dist = Math.sqrt(Math.pow(targetX - buttonX, 2) + Math.pow(targetY - buttonY, 2));
                 if (dist < MAIN_RADIUS * 1.5) {
                     toggleDarkMode();
@@ -354,20 +325,12 @@
             const updateTarget = (x, y) => {
                 targetX = x;
                 targetY = y;
-                
-                // Update Parallax targets (-1 to 1 based on screen center)
                 paraTargetX = (x - window.innerWidth / 2) / (window.innerWidth / 2);
                 paraTargetY = (y - window.innerHeight / 2) / (window.innerHeight / 2);
             };
 
-            window.addEventListener("mousemove", (e) => {
-                updateTarget(e.clientX, e.clientY);
-            });
-
-            window.addEventListener("touchmove", (e) => {
-                updateTarget(e.touches[0].clientX, e.touches[0].clientY);
-            }, { passive: true });
-
+            window.addEventListener("mousemove", (e) => updateTarget(e.clientX, e.clientY));
+            window.addEventListener("touchmove", (e) => updateTarget(e.touches[0].clientX, e.touches[0].clientY), { passive: true });
             window.addEventListener("touchstart", (e) => {
                 updateTarget(e.touches[0].clientX, e.touches[0].clientY);
                 currentX = targetX;
@@ -377,9 +340,9 @@
             const lerp = (start, end, factor) => start + (end - start) * factor;
 
             function animate() {
-                time += 0.15; // Swirl speed
+                frameCount++;
+                time += 0.15; 
 
-                // 1. Calculate Velocity for the fluid dynamic look
                 let dx = targetX - currentX;
                 let dy = targetY - currentY;
                 let velocity = Math.sqrt(dx*dx + dy*dy);
@@ -387,60 +350,56 @@
                 currentX = lerp(currentX, targetX, LAG_FACTOR);
                 currentY = lerp(currentY, targetY, LAG_FACTOR);
 
-                // Add current point and its specific velocity to the trail
                 trail.unshift({ x: currentX, y: currentY, vel: velocity });
-
                 if (trail.length > TRAIL_LENGTH) {
                     trail.pop();
                 }
 
-                // 2. Generate Mask with Swirl and Velocity scaling
-                const maskGradients = trail.map((point, index) => {
-                    const progress = index / TRAIL_LENGTH;
+                // 1. THROTTLE MASK UPDATE: Only parse CSS string every 2nd frame (~30fps mask)
+                if (frameCount % 2 === 0) {
+                    let maskString = "";
+                    let len = trail.length;
                     
-                    // Lingering opacity fade (cubic decay means it fades slower at first, then drops off)
-                    const opacity = Math.max(0, 1 - Math.pow(progress, 1.5)); 
-                    
-                    // Size swells when moving faster, then shrinks down the tail
-                    let baseSize = MAIN_RADIUS + (Math.min(point.vel * 1.5, 80));
-                    const size = baseSize * (1 - progress * 0.4); 
-                    
-                    // The Swirl Effect Calculation
-                    // Amplitude expands based on velocity and how far down the tail it is
-                    const swirlAmplitude = (10 + point.vel * 0.8) * progress;
-                    // Rotate backward through the tail
-                    const swirlAngle = (index * 0.25) - time; 
-                    
-                    const offsetX = Math.cos(swirlAngle) * swirlAmplitude;
-                    const offsetY = Math.sin(swirlAngle) * swirlAmplitude;
+                    // Direct string building loop avoids array .map() and .join() overhead
+                    for (let i = 0; i < len; i++) {
+                        let point = trail[i];
+                        let progress = i / TRAIL_LENGTH;
+                        
+                        // 2. TRUNCATE DECIMALS: Drastically reduces CSS engine parsing time
+                        let opacity = Math.max(0, 1 - Math.pow(progress, 1.5)).toFixed(2); 
+                        
+                        let baseSize = MAIN_RADIUS + (Math.min(point.vel * 1.5, 80));
+                        let size = (baseSize * (1 - progress * 0.4)).toFixed(1); 
+                        
+                        let swirlAmplitude = (10 + point.vel * 0.8) * progress;
+                        let swirlAngle = (i * 0.25) - time; 
+                        
+                        let finalX = (point.x + Math.cos(swirlAngle) * swirlAmplitude).toFixed(1);
+                        let finalY = (point.y + Math.sin(swirlAngle) * swirlAmplitude).toFixed(1);
 
-                    const finalX = point.x + offsetX;
-                    const finalY = point.y + offsetY;
+                        maskString += `radial-gradient(circle ${size}px at ${finalX}px ${finalY}px, rgba(0, 0, 0, ${opacity}) 30%, transparent 80%)`;
+                        if (i < len - 1) maskString += ", ";
+                    }
 
-                    // A softer edge gradient blends the fluid circles together better
-                    return `radial-gradient(circle ${size}px at ${finalX}px ${finalY}px, rgba(0, 0, 0, ${opacity}) 30%, transparent 80%)`;
-                });
+                    revealLayer.style.webkitMaskImage = maskString;
+                    revealLayer.style.maskImage = maskString;
+                }
 
-                const maskString = maskGradients.join(", ");
-                revealLayer.style.webkitMaskImage = maskString;
-                revealLayer.style.maskImage = maskString;
-
-                // 3. Update Parallax Elements
+                // 3. PARALLAX RUNS AT 60FPS: Using translate3d forces it to the GPU
                 paraCurrentX = lerp(paraCurrentX, paraTargetX, 0.05);
                 paraCurrentY = lerp(paraCurrentY, paraTargetY, 0.05);
 
-                bgs.forEach(bg => {
-                    // Background moves opposite to cursor
-                    bg.style.transform = `translate(${paraCurrentX * -20}px, ${paraCurrentY * -20}px)`;
-                });
-                subjects.forEach(sub => {
-                    // Foreground subjects follow cursor slightly 
-                    sub.style.transform = `translate(${paraCurrentX * 15}px, ${paraCurrentY * 15}px)`;
-                });
-                scrollWrappers.forEach(sw => {
-                    // Text layer follows cursor even more aggressively
-                    sw.style.transform = `translate(${paraCurrentX * 30}px, ${paraCurrentY * 30}px)`;
-                });
+                // Rounding translation pixels prevents sub-pixel rendering blur/jiggle
+                let transX_bg = (paraCurrentX * -20).toFixed(1);
+                let transY_bg = (paraCurrentY * -20).toFixed(1);
+                let transX_sub = (paraCurrentX * 15).toFixed(1);
+                let transY_sub = (paraCurrentY * 15).toFixed(1);
+                let transX_text = (paraCurrentX * 30).toFixed(1);
+                let transY_text = (paraCurrentY * 30).toFixed(1);
+
+                bgs.forEach(bg => bg.style.transform = `translate3d(${transX_bg}px, ${transY_bg}px, 0)`);
+                subjects.forEach(sub => sub.style.transform = `translate3d(${transX_sub}px, ${transY_sub}px, 0)`);
+                scrollWrappers.forEach(sw => sw.style.transform = `translate3d(${transX_text}px, ${transY_text}px, 0)`);
 
                 requestAnimationFrame(animate);
             }
