@@ -48,12 +48,14 @@
         /* Object-fit ensures images crop properly on mobile verticals */
         .layer-img {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: -5%; /* Added buffer for parallax */
+            left: -5%;
+            width: 110%; /* Scaled up slightly to hide edges during parallax */
+            height: 110%;
             object-fit: cover;
             object-position: center;
+            transform-origin: center;
+            will-change: transform;
         }
 
         .scroll-text-wrapper {
@@ -65,6 +67,7 @@
             overflow: hidden;
             pointer-events: none;
             z-index: 1;
+            will-change: transform;
         }
 
         .scroll-text-wrapper.reveal {
@@ -105,40 +108,27 @@
             }
         }
 
-        /* 
-         * Z-Index Architecture:
-         * 1. Base Layer (Bottom) 
-         */
-        .base-layer {
-            z-index: 1;
-        }
+        /* Base Layer */
+        .base-layer { z-index: 1; }
         .base-layer .bg { z-index: 1; }
         .base-layer .subject { z-index: 2; }
 
-        /* 
-         * 2. Reveal Layer (Middle) 
-         * This layer is completely hidden by default until the JS applies the mask.
-         */
+        /* Reveal Layer */
         .reveal-layer {
             z-index: 2;
-            /* Initialize with empty mask */
             -webkit-mask-image: radial-gradient(circle 0px at 50% 50%, transparent 100%);
             mask-image: radial-gradient(circle 0px at 50% 50%, transparent 100%);
             -webkit-mask-repeat: no-repeat;
             mask-repeat: no-repeat;
         }
         
-        /* The visual filter: Darkens/contrasts the background inside the mask */
         .reveal-layer .bg {
             z-index: 1;
             filter: brightness(0.4) contrast(1.3); 
         }
         .reveal-layer .subject { z-index: 2; }
 
-        /* 
-         * 3. UI Layer (Top) 
-         * Unaffected by the mask, remains visible on top.
-         */
+        /* UI Layer */
         .ui-layer {
             z-index: 10;
             display: flex;
@@ -146,7 +136,6 @@
             justify-content: space-between;
             padding: 40px;
             color: #fff;
-            /* Text shadow only kept here for UI elements that might need it */
             text-shadow: 0px 2px 10px rgba(0,0,0,0.5);
             pointer-events: none;
         }
@@ -180,7 +169,7 @@
             color: #000;
         }
 
-        /* Nav Layering for Color Inversion */
+        /* Nav Layering */
         .nav-container {
             position: absolute;
             top: 40px;
@@ -195,23 +184,10 @@
             pointer-events: none;
         }
 
-        .nav-container.base {
-            color: #000;
-            z-index: 3;
-        }
-
-        .nav-container.reveal {
-            color: #fff;
-            z-index: 1;
-        }
-
-        body.dark-mode .nav-container.base {
-            color: #fff;
-        }
-
-        body.dark-mode .nav-container.reveal {
-            color: #000;
-        }
+        .nav-container.base { color: #000; z-index: 3; }
+        .nav-container.reveal { color: #fff; z-index: 1; }
+        body.dark-mode .nav-container.base { color: #fff; }
+        body.dark-mode .nav-container.reveal { color: #000; }
 
         .toggle-icon svg {
             display: block;
@@ -220,7 +196,7 @@
             stroke: currentColor;
         }
 
-        /* Bottom UI Layering for Color Inversion */
+        /* Bottom UI */
         .bottom-ui-container {
             position: absolute;
             bottom: 40px;
@@ -229,23 +205,10 @@
             pointer-events: none;
         }
 
-        .bottom-ui-container.base {
-            color: #000;
-            z-index: 3;
-        }
-
-        .bottom-ui-container.reveal {
-            color: #fff;
-            z-index: 1;
-        }
-
-        body.dark-mode .bottom-ui-container.base {
-            color: #fff;
-        }
-
-        body.dark-mode .bottom-ui-container.reveal {
-            color: #000;
-        }
+        .bottom-ui-container.base { color: #000; z-index: 3; }
+        .bottom-ui-container.reveal { color: #fff; z-index: 1; }
+        body.dark-mode .bottom-ui-container.base { color: #fff; }
+        body.dark-mode .bottom-ui-container.reveal { color: #000; }
 
         .bottom-ui-container h1 {
             font-size: 3rem;
@@ -279,7 +242,7 @@
 
     <div class="reveal-container">
         
-        <!-- BASE LAYER: Standard Background & Photo -->
+        <!-- BASE LAYER -->
         <div class="layer base-layer">
             <img src="IMG_0337.PNG" alt="Base Background" class="layer-img bg">
             <div class="nav-container base">
@@ -304,7 +267,7 @@
             <img src="IMG_0336.PNG" alt="Static Photo" class="layer-img subject">
         </div>
 
-        <!-- REVEAL LAYER: Darkened Background & Drawing -->
+        <!-- REVEAL LAYER -->
         <div class="layer reveal-layer" id="revealLayer">
             <img src="IMG_0337.PNG" alt="Darkened Background" class="layer-img bg">
             <div class="nav-container reveal">
@@ -329,7 +292,7 @@
             <img src="IMG_0335.PNG" alt="Revealed Drawing" class="layer-img subject">
         </div>
 
-        <!-- UI LAYER: Navigation and Overlays -->
+        <!-- UI LAYER -->
         <div class="layer ui-layer">
             <nav>
                 <div style="visibility: hidden;">Max Tianyu Wang</div>
@@ -345,15 +308,26 @@
 
             // Configurable constraints
             const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 768;
-            const MAIN_RADIUS = isMobile ? 80 : 130;     // Smaller on mobile
-            const TRAIL_LENGTH = 15;     // Number of flutter trail circles
-            const LAG_FACTOR = 0.1;     // Lower = smoother/more lag, Higher = snappier
-
-            // Track target (mouse/touch) and current (animated) coordinates
+            const MAIN_RADIUS = isMobile ? 60 : 100;     // Base radius
+            const TRAIL_LENGTH = 60;                     // Greatly increased for a longer return time
+            const LAG_FACTOR = 0.15;                     // Cursor tracking lag
+            
+            // Track target (mouse) and current (animated) coordinates
             let targetX = window.innerWidth / 2;
             let targetY = window.innerHeight / 2;
             let currentX = targetX;
             let currentY = targetY;
+            let time = 0; // Used for swirl rotation
+
+            // Parallax State
+            let paraTargetX = 0;
+            let paraTargetY = 0;
+            let paraCurrentX = 0;
+            let paraCurrentY = 0;
+
+            const bgs = document.querySelectorAll('.bg');
+            const subjects = document.querySelectorAll('.subject');
+            const scrollWrappers = document.querySelectorAll('.scroll-text-wrapper');
 
             let isDarkMode = false;
             const toggle = document.getElementById("dark-mode-toggle");
@@ -365,34 +339,35 @@
                 document.body.classList.toggle('dark-mode', isDarkMode);
                 
                 if (isDarkMode) {
-                    baseSubject.src = "IMG_0335.PNG"; // Drawing
-                    revealSubject.src = "IMG_0336.PNG"; // Photo
+                    baseSubject.src = "IMG_0335.PNG"; 
+                    revealSubject.src = "IMG_0336.PNG"; 
                 } else {
-                    baseSubject.src = "IMG_0336.PNG"; // Photo
-                    revealSubject.src = "IMG_0335.PNG"; // Drawing
+                    baseSubject.src = "IMG_0336.PNG"; 
+                    revealSubject.src = "IMG_0335.PNG"; 
                 }
             };
 
-            // Hitbox click logic: Button is pressed if the circle (at currentX, currentY) covers it
             window.addEventListener("click", (e) => {
                 const rect = toggle.getBoundingClientRect();
                 const buttonX = rect.left + rect.width / 2;
                 const buttonY = rect.top + rect.height / 2;
                 
-                // Unified click check for both desktop and mobile using the circle distance
-                const dist = Math.sqrt(Math.pow(currentX - buttonX, 2) + Math.pow(currentY - buttonY, 2));
-                if (dist < MAIN_RADIUS) {
+                // Use targetX/Y for accurate click detection instead of the lagging currentX/Y
+                const dist = Math.sqrt(Math.pow(targetX - buttonX, 2) + Math.pow(targetY - buttonY, 2));
+                if (dist < MAIN_RADIUS * 1.5) {
                     toggleDarkMode();
                 }
             });
 
-            // Array to hold the history of positions for the flutter trail
             const trail = [];
 
-            // Event Listeners for Mouse and Touch
             const updateTarget = (x, y) => {
                 targetX = x;
                 targetY = y;
+                
+                // Update Parallax targets (-1 to 1 based on screen center)
+                paraTargetX = (x - window.innerWidth / 2) / (window.innerWidth / 2);
+                paraTargetY = (y - window.innerHeight / 2) / (window.innerHeight / 2);
             };
 
             window.addEventListener("mousemove", (e) => {
@@ -405,55 +380,81 @@
 
             window.addEventListener("touchstart", (e) => {
                 updateTarget(e.touches[0].clientX, e.touches[0].clientY);
-                // Snap current to target on initial touch to prevent sliding from center
                 currentX = targetX;
                 currentY = targetY;
             }, { passive: true });
 
-            // Linear interpolation function for smooth motion
             const lerp = (start, end, factor) => start + (end - start) * factor;
 
-            // Main Animation Loop
             function animate() {
-                // Smoothly move current position towards target position
+                time += 0.15; // Swirl speed
+
+                // 1. Calculate Velocity for the fluid dynamic look
+                let dx = targetX - currentX;
+                let dy = targetY - currentY;
+                let velocity = Math.sqrt(dx*dx + dy*dy);
+
                 currentX = lerp(currentX, targetX, LAG_FACTOR);
                 currentY = lerp(currentY, targetY, LAG_FACTOR);
 
-                // Add newest position to the front of the trail array
-                trail.unshift({ x: currentX, y: currentY });
+                // Add current point and its specific velocity to the trail
+                trail.unshift({ x: currentX, y: currentY, vel: velocity });
 
-                // Keep the trail at the maximum specified length
                 if (trail.length > TRAIL_LENGTH) {
                     trail.pop();
                 }
 
-                // Generate the complex mask string
+                // 2. Generate Mask with Swirl and Velocity scaling
                 const maskGradients = trail.map((point, index) => {
-                    // Calculate decay based on position in the trail array
                     const progress = index / TRAIL_LENGTH;
                     
-                    // Older points get smaller
-                    const size = MAIN_RADIUS * (1 - progress * 0.8); 
+                    // Lingering opacity fade (cubic decay means it fades slower at first, then drops off)
+                    const opacity = Math.max(0, 1 - Math.pow(progress, 1.5)); 
                     
-                    // Older points fade out
-                    const opacity = 1 - Math.pow(progress, 2); 
+                    // Size swells when moving faster, then shrinks down the tail
+                    let baseSize = MAIN_RADIUS + (Math.min(point.vel * 1.5, 80));
+                    const size = baseSize * (1 - progress * 0.4); 
                     
-                    // Construct radial-gradient string for this specific trail point
-                    return `radial-gradient(circle ${size}px at ${point.x}px ${point.y}px, rgba(0, 0, 0, ${opacity}) 70%, transparent 100%)`;
+                    // The Swirl Effect Calculation
+                    // Amplitude expands based on velocity and how far down the tail it is
+                    const swirlAmplitude = (10 + point.vel * 0.8) * progress;
+                    // Rotate backward through the tail
+                    const swirlAngle = (index * 0.25) - time; 
+                    
+                    const offsetX = Math.cos(swirlAngle) * swirlAmplitude;
+                    const offsetY = Math.sin(swirlAngle) * swirlAmplitude;
+
+                    const finalX = point.x + offsetX;
+                    const finalY = point.y + offsetY;
+
+                    // A softer edge gradient blends the fluid circles together better
+                    return `radial-gradient(circle ${size}px at ${finalX}px ${finalY}px, rgba(0, 0, 0, ${opacity}) 30%, transparent 80%)`;
                 });
 
-                // Combine all gradients. In CSS masks, multiple gradients composite on top of each other.
                 const maskString = maskGradients.join(", ");
-
-                // Apply the generated mask to the DOM element
                 revealLayer.style.webkitMaskImage = maskString;
                 revealLayer.style.maskImage = maskString;
 
-                // Request the next frame
+                // 3. Update Parallax Elements
+                paraCurrentX = lerp(paraCurrentX, paraTargetX, 0.05);
+                paraCurrentY = lerp(paraCurrentY, paraTargetY, 0.05);
+
+                bgs.forEach(bg => {
+                    // Background moves opposite to cursor
+                    bg.style.transform = `translate(${paraCurrentX * -20}px, ${paraCurrentY * -20}px)`;
+                });
+                subjects.forEach(sub => {
+                    // Foreground subjects follow cursor slightly 
+                    sub.style.transform = `translate(${paraCurrentX * 15}px, ${paraCurrentY * 15}px)`;
+                });
+                scrollWrappers.forEach(sw => {
+                    // Text layer follows cursor even more aggressively
+                    sw.style.transform = `translate(${paraCurrentX * 30}px, ${paraCurrentY * 30}px)`;
+                });
+
                 requestAnimationFrame(animate);
             }
 
-            // Kick off the animation loop
             animate();
         });
     </script>
