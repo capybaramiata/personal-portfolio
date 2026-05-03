@@ -405,9 +405,13 @@
         document.addEventListener("DOMContentLoaded", () => {
             const revealLayer = document.getElementById("revealLayer");
 
+            // Constraints optimized
             const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 768;
+            const isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+
             const MAIN_RADIUS = isMobile ? 60 : 100;
-            const TRAIL_LENGTH = 80;
+            // Firefox struggles with heavy radial gradients, so we cap its trail length
+            const TRAIL_LENGTH = isFirefox ? 25 : 80; 
             const LAG_FACTOR = 0.15;
             
             let targetX = window.innerWidth / 2;
