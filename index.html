@@ -16,11 +16,32 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plaster&display=swap" rel="stylesheet">
     <style>
-        /* Reset & Base Styles */
+        /* === CSS Custom Properties === */
+        :root {
+            /* Colors */
+            --bg-base-light: #ebebeb;
+            --bg-base-dark: #000;
+            
+            --text-main-light: #000;
+            --text-main-dark: #fff;
+            
+            --text-sub-light: #444;
+            --text-sub-dark: #ddd;
+            
+            --text-sub-light-alt: #bbb;
+            --text-sub-dark-alt: #222;
+
+            /* Dimensions & Timing */
+            --pad: 40px;
+            --icon-size: 24px;
+            --transition: 0.6s ease-in-out;
+            --font-serif: 'Instrument Serif', serif;
+            --font-display: 'Plaster', serif;
+        }
+
+        /* === Reset & Base Styles === */
         * {
             margin: 0;
             padding: 0;
@@ -31,25 +52,25 @@
             width: 100vw;
             height: 100vh;
             overflow: hidden;
-            background-color: #ebebeb; 
-            font-family: 'Instrument Serif', serif;
+            background-color: var(--bg-base-light); 
+            font-family: var(--font-serif);
             overscroll-behavior: none;
             cursor: auto; 
-            transition: background-color 0.6s ease-in-out;
+            transition: background-color var(--transition);
         }
 
         body.dark-mode {
-            background-color: #000;
+            background-color: var(--bg-base-dark);
         }
 
-        /* Preloader Styles */
+        /* === Preloader === */
         #preloader {
             position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
-            background-color: #000;
+            background-color: var(--bg-base-dark);
             z-index: 9999;
             display: flex;
             justify-content: center;
@@ -71,6 +92,7 @@
             }
         }
 
+        /* === Core Architecture === */
         .reveal-container {
             position: relative;
             width: 100vw;
@@ -86,6 +108,15 @@
             pointer-events: none;
         }
 
+        /* Hardware Accelerated Layering */
+        .base-layer { z-index: 1; }
+        
+        .reveal-layer {
+            z-index: 2;
+            transform: translateZ(0); /* Force GPU compositing layer */
+        }
+
+        /* === Backgrounds === */
         .layer-img {
             position: absolute;
             top: -5%;
@@ -96,13 +127,17 @@
             object-position: center;
             transform-origin: center;
             will-change: transform;
+            transition: filter var(--transition);
         }
 
-        /* Smooth filter transitions for background */
-        .layer-img.bg {
-            transition: filter 0.6s ease-in-out;
+        .reveal-layer .bg {
+            filter: brightness(0.4) contrast(1.3);
         }
 
+        body.dark-mode .base-layer .bg { filter: brightness(0.25) contrast(1.2); }
+        body.dark-mode .reveal-layer .bg { filter: none; }
+
+        /* === Subjects === */
         .subject-wrapper {
             position: absolute;
             top: -5%;
@@ -122,10 +157,9 @@
             object-fit: contain;
             transform-origin: bottom center;
             position: absolute;
-            transition: opacity 0.6s ease-in-out;
+            transition: opacity var(--transition);
         }
 
-        /* Crossfade classes */
         .img-light { opacity: 1; }
         .img-dark { opacity: 0; }
         body.dark-mode .img-light { opacity: 0; }
@@ -136,6 +170,7 @@
         body.dark-mode .reveal-layer .img-light { opacity: 1; }
         body.dark-mode .reveal-layer .img-dark { opacity: 0; }
 
+        /* === Marquee Text === */
         .scroll-text-wrapper {
             position: absolute;
             left: 0;
@@ -146,12 +181,12 @@
             will-change: transform;
         }
 
-        .scroll-text-wrapper.main-track-wrapper {
+        .main-track-wrapper {
             top: 48%;
             height: 5.2rem;
         }
 
-        .scroll-text-wrapper.sub-track-wrapper {
+        .sub-track-wrapper {
             top: 38%;
             height: 4.8rem;
         }
@@ -162,34 +197,40 @@
             left: 0;
             display: inline-flex;
             white-space: nowrap;
-            font-family: 'Plaster', serif;
+            font-family: var(--font-display);
             font-weight: 700;
             text-transform: uppercase;
             transform: translate3d(-50%, -50%, 0);
             will-change: transform;
         }
 
-        /* Main Track */
-        .scroll-text-track.main {
-            font-size: 7rem;
-            letter-spacing: 0.1em;
-            color: #000;
-            animation: scrollRight 100s linear infinite;
-        }
-        .scroll-text-track.main.reveal { color: #fff; }
-
-        /* Sub Track */
-        .scroll-text-track.sub {
-            font-size: 5.5rem; 
-            letter-spacing: 0.15em; 
-            color: #444; 
-            animation: scrollLeft 140s linear infinite;
-        }
-        .scroll-text-track.sub.reveal { color: #ddd; }
-
         .scroll-text-item {
             display: inline-block;
         }
+
+        /* Typography Tracking */
+        .scroll-text-track.main {
+            font-size: 7rem;
+            letter-spacing: 0.1em;
+            animation: scrollRight 100s linear infinite;
+        }
+
+        .scroll-text-track.sub {
+            font-size: 5.5rem; 
+            letter-spacing: 0.15em; 
+            animation: scrollLeft 140s linear infinite;
+        }
+
+        /* Dynamic Colors for Base/Reveal Tracks */
+        .text-main-base { color: var(--text-main-light); }
+        .text-main-reveal { color: var(--text-main-dark); }
+        body.dark-mode .text-main-base { color: var(--text-main-dark); }
+        body.dark-mode .text-main-reveal { color: var(--text-main-light); }
+        
+        .text-sub-base { color: var(--text-sub-light); }
+        .text-sub-reveal { color: var(--text-sub-dark); }
+        body.dark-mode .text-sub-base { color: var(--text-sub-light-alt); }
+        body.dark-mode .text-sub-reveal { color: var(--text-sub-dark-alt); }
 
         @keyframes scrollRight {
             0% { transform: translate3d(-50%, -50%, 0); }
@@ -201,108 +242,61 @@
             100% { transform: translate3d(-50%, -50%, 0); }
         }
 
-        .base-layer { z-index: 1; }
-        .base-layer .bg { z-index: 1; }
-
-        .reveal-layer {
-            z-index: 2;
-            -webkit-mask-image: radial-gradient(circle 0px at 50% 50%, transparent 100%); 
-            mask-image: radial-gradient(circle 0px at 50% 50%, transparent 100%);
-            -webkit-mask-repeat: no-repeat;
-            mask-repeat: no-repeat;
-            will-change: mask-image, -webkit-mask-image;
-            transform: translateZ(0);
-        }
-        
-        .reveal-layer .bg {
-            z-index: 1;
-            filter: brightness(0.4) contrast(1.3);
-        }
-
-        .ui-layer {
-            z-index: 10;
+        /* === Navigation & UI === */
+        .nav-container {
+            position: absolute;
+            top: var(--pad);
+            left: var(--pad);
+            right: var(--pad);
             display: flex;
-            flex-direction: column;
             justify-content: space-between;
-            padding: 40px;
-            color: #fff;
-            text-shadow: 0px 2px 10px rgba(0,0,0,0.5);
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
             pointer-events: none;
         }
 
+        .nav-base { color: var(--text-main-light); z-index: 3; }
+        .nav-reveal { color: var(--text-main-dark); z-index: 1; }
+        body.dark-mode .nav-base { color: var(--text-main-dark); }
+        body.dark-mode .nav-reveal { color: var(--text-main-light); }
+
+        nav > div { pointer-events: auto; }
+
+        /* === Theme Toggle Icons === */
         #dark-mode-toggle {
             cursor: pointer;
             pointer-events: auto;
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 24px;
-            height: 24px;
+            width: var(--icon-size);
+            height: var(--icon-size);
         }
 
         .toggle-icon {
             position: relative;
-            width: 24px;
-            height: 24px;
+            width: var(--icon-size);
+            height: var(--icon-size);
         }
 
         .toggle-icon svg {
             position: absolute;
             top: 0;
             left: 0;
-            width: 24px;
-            height: 24px;
+            width: var(--icon-size);
+            height: var(--icon-size);
             stroke: currentColor;
             transition: all 0.5s ease;
         }
 
         .icon-moon { opacity: 1; transform: rotate(0) scale(1); }
         .icon-sun { opacity: 0; transform: rotate(-90deg) scale(0.5); }
-
         body.dark-mode .icon-moon { opacity: 0; transform: rotate(90deg) scale(0.5); }
         body.dark-mode .icon-sun { opacity: 1; transform: rotate(0) scale(1); }
-
-        body.dark-mode .base-layer .bg { filter: brightness(0.25) contrast(1.2); }
-        body.dark-mode .reveal-layer .bg { filter: none; }
-        
-        body.dark-mode .scroll-text-track.main { color: #fff; }
-        body.dark-mode .scroll-text-track.main.reveal { color: #000; }
-        
-        body.dark-mode .scroll-text-track.sub { color: #bbb; }
-        body.dark-mode .scroll-text-track.sub.reveal { color: #222; }
-
-        .nav-container {
-            position: absolute;
-            top: 40px;
-            left: 40px;
-            right: 40px;
-            display: flex;
-            justify-content: space-between;
-            font-size: 14px;
-            font-weight: 600;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            pointer-events: none;
-        }
-
-        .nav-container.base { color: #000; z-index: 3; }
-        .nav-container.reveal { color: #fff; z-index: 1; }
-        body.dark-mode .nav-container.base { color: #fff; }
-        body.dark-mode .nav-container.reveal { color: #000; }
-
-        nav {
-            display: flex;
-            justify-content: space-between;
-            font-size: 14px;
-            font-weight: 600;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            pointer-events: none;
-            width: 100%;
-        }
-
-        nav > div { pointer-events: auto; }
     </style>
+    
     <script type="application/ld+json">
     {
         "@context": "https://schema.org/",
@@ -327,10 +321,13 @@
 
     <div class="reveal-container">
         
-        <!-- BASE LAYER -->
+        <!-- ==========================================
+             BASE LAYER (Default Visiblity & SEO)
+        =========================================== -->
         <div class="layer base-layer">
             <img src="IMG_0337.PNG" alt="Background image of Max Tianyu Wang's photography portfolio" class="layer-img bg">
-            <div class="nav-container base">
+            
+            <div class="nav-container nav-base">
                 <div>Max Tianyu Wang</div>
                 <div id="dark-mode-toggle">
                     <div class="toggle-icon">
@@ -341,14 +338,14 @@
             </div>
             
             <div class="scroll-text-wrapper sub-track-wrapper">
-                <div class="scroll-text-track sub">
+                <div class="scroll-text-track sub text-sub-base">
                     <span class="scroll-text-item">PHOTOGRAPHER · VIDEOGRAPHER · FILMMAKER · CREATOR · CAD DESIGNER · MUN PRESIDENT · PRIME MINISTER · PROGRAMMER · SPEAKER · LEADER · GRAPHIC DESIGNER · SKI INSTRUCTOR · ROBOTICS LEAD ·&nbsp;</span>
                     <span class="scroll-text-item">PHOTOGRAPHER · VIDEOGRAPHER · FILMMAKER · CREATOR · CAD DESIGNER · MUN PRESIDENT · PRIME MINISTER · PROGRAMMER · SPEAKER · LEADER · GRAPHIC DESIGNER · SKI INSTRUCTOR · ROBOTICS LEAD ·&nbsp;</span>
                 </div>
             </div>
 
             <div class="scroll-text-wrapper main-track-wrapper">
-                <div class="scroll-text-track main">
+                <div class="scroll-text-track main text-main-base">
                     <span class="scroll-text-item">MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;</span>
                     <span class="scroll-text-item">MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;</span>
                 </div>
@@ -360,57 +357,70 @@
             </div>
         </div>
 
-        <!-- REVEAL LAYER -->
-        <div class="layer reveal-layer" id="revealLayer">
-            <img src="IMG_0337.PNG" alt="Darkened background for dark mode portfolio display" class="layer-img bg">
-            <div class="nav-container reveal">
-                <div>Max Tianyu Wang</div>
-                <div class="theme-toggle-reveal">
-                    <div class="toggle-icon">
-                        <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
-                        <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+        <!-- ==========================================
+             REVEAL LAYER (SVG with ForeignObject Mask)
+        =========================================== -->
+        <svg class="layer reveal-layer" id="revealLayer" aria-hidden="true" width="100%" height="100%" preserveAspectRatio="none">
+            <defs>
+                <radialGradient id="soft-brush">
+                    <stop offset="15%" stop-color="white" stop-opacity="1" />
+                    <stop offset="45%" stop-color="white" stop-opacity="0.5" />
+                    <stop offset="80%" stop-color="white" stop-opacity="0" />
+                </radialGradient>
+                
+                <mask id="cursor-mask" maskUnits="userSpaceOnUse" x="-50%" y="-50%" width="200%" height="200%">
+                    <rect width="100%" height="100%" fill="black" />
+                    <!-- Circles injected dynamically via JS -->
+                    <g id="mask-elements"></g>
+                </mask>
+            </defs>
+
+            <foreignObject width="100%" height="100%" mask="url(#cursor-mask)">
+                <!-- Strict XML requires xmlns and strictly self-closed elements like <img/> and &#160; -->
+                <div xmlns="http://www.w3.org/1999/xhtml" style="width: 100vw; height: 100vh; position: absolute; top: 0; left: 0;">
+                    <img src="IMG_0337.PNG" class="layer-img bg" alt="" />
+                    
+                    <div class="nav-container nav-reveal">
+                        <div>Max Tianyu Wang</div>
+                        <div class="theme-toggle-reveal" style="pointer-events: none;">
+                            <div class="toggle-icon">
+                                <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+                                <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="scroll-text-wrapper sub-track-wrapper">
+                        <div class="scroll-text-track sub text-sub-reveal">
+                            <span class="scroll-text-item">PHOTOGRAPHER · VIDEOGRAPHER · FILMMAKER · CREATOR · CAD DESIGNER · MUN PRESIDENT · PRIME MINISTER · PROGRAMMER · SPEAKER · LEADER · GRAPHIC DESIGNER · SKI INSTRUCTOR · ROBOTICS LEAD ·&#160;</span>
+                            <span class="scroll-text-item">PHOTOGRAPHER · VIDEOGRAPHER · FILMMAKER · CREATOR · CAD DESIGNER · MUN PRESIDENT · PRIME MINISTER · PROGRAMMER · SPEAKER · LEADER · GRAPHIC DESIGNER · SKI INSTRUCTOR · ROBOTICS LEAD ·&#160;</span>
+                        </div>
+                    </div>
+
+                    <div class="scroll-text-wrapper main-track-wrapper">
+                        <div class="scroll-text-track main text-main-reveal">
+                            <span class="scroll-text-item">MAX TIANYU WANG&#160;MAX TIANYU WANG&#160;MAX TIANYU WANG&#160;MAX TIANYU WANG&#160;MAX TIANYU WANG&#160;MAX TIANYU WANG&#160;MAX TIANYU WANG&#160;MAX TIANYU WANG&#160;</span>
+                            <span class="scroll-text-item">MAX TIANYU WANG&#160;MAX TIANYU WANG&#160;MAX TIANYU WANG&#160;MAX TIANYU WANG&#160;MAX TIANYU WANG&#160;MAX TIANYU WANG&#160;MAX TIANYU WANG&#160;MAX TIANYU WANG&#160;</span>
+                        </div>
+                    </div>
+
+                    <div class="subject-wrapper subject">
+                        <img src="IMG_0336.PNG" class="subject-img img-light" alt="" />
+                        <img src="IMG_0335.PNG" class="subject-img img-dark" alt="" />
                     </div>
                 </div>
-            </div>
-            
-            <div class="scroll-text-wrapper sub-track-wrapper reveal">
-                <div class="scroll-text-track sub reveal">
-                    <span class="scroll-text-item">PHOTOGRAPHER · VIDEOGRAPHER · FILMMAKER · CREATOR · CAD DESIGNER · MUN PRESIDENT · PRIME MINISTER · PROGRAMMER · SPEAKER · LEADER · GRAPHIC DESIGNER · SKI INSTRUCTOR · ROBOTICS LEAD ·&nbsp;</span>
-                    <span class="scroll-text-item">PHOTOGRAPHER · VIDEOGRAPHER · FILMMAKER · CREATOR · CAD DESIGNER · MUN PRESIDENT · PRIME MINISTER · PROGRAMMER · SPEAKER · LEADER · GRAPHIC DESIGNER · SKI INSTRUCTOR · ROBOTICS LEAD ·&nbsp;</span>
-                </div>
-            </div>
-
-            <div class="scroll-text-wrapper main-track-wrapper reveal">
-                <div class="scroll-text-track main reveal">
-                    <span class="scroll-text-item">MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;</span>
-                    <span class="scroll-text-item">MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;</span>
-                </div>
-            </div>
-
-            <div class="subject-wrapper subject">
-                <img src="IMG_0336.PNG" alt="Portrait of Max Tianyu Wang overlay in light theme" class="subject-img img-light">
-                <img src="IMG_0335.PNG" alt="Artistic illustration of Max Tianyu Wang overlay in dark theme" class="subject-img img-dark">
-            </div>
-        </div>
-
-        <!-- UI LAYER -->
-        <div class="layer ui-layer">
-            <nav>
-                <div style="visibility: hidden;">Max Tianyu Wang</div>
-            </nav>
-        </div>
+            </foreignObject>
+        </svg>
 
     </div>
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-            const revealLayer = document.getElementById("revealLayer");
-
             const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 768;
             const isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
 
             const MAIN_RADIUS = isMobile ? 60 : 100;
-            const TRAIL_LENGTH = isFirefox ? 25 : 80; 
+            const TRAIL_LENGTH = isFirefox ? 25 : 60; 
             const LAG_FACTOR = 0.15;
             
             let targetX = window.innerWidth / 2;
@@ -442,21 +452,31 @@
                 centerY = window.innerHeight / 2;
             });
 
+            // Parallax Elements
             const bgs = document.querySelectorAll('.bg');
             const subjects = document.querySelectorAll('.subject-wrapper');
             const scrollWrappers = document.querySelectorAll('.scroll-text-wrapper');
 
+            // Theme Toggle
             let isDarkMode = false;
             const toggle = document.getElementById("dark-mode-toggle");
-
-            const toggleDarkMode = () => {
+            toggle.addEventListener("click", () => {
                 isDarkMode = !isDarkMode;
                 document.body.classList.toggle('dark-mode', isDarkMode);
-            };
-
-            toggle.addEventListener("click", () => {
-                toggleDarkMode();
             });
+
+            // SVG Mask Initialization
+            const maskGroup = document.getElementById('mask-elements');
+            const maskCircles = [];
+            const SVG_NS = "http://www.w3.org/2000/svg";
+            
+            for (let i = 0; i < TRAIL_LENGTH; i++) {
+                const circle = document.createElementNS(SVG_NS, "circle");
+                circle.setAttribute('fill', 'url(#soft-brush)');
+                circle.setAttribute('r', '0');
+                maskGroup.appendChild(circle);
+                maskCircles.push(circle);
+            }
 
             const trail = [];
 
@@ -465,7 +485,6 @@
                 clearTimeout(mouseTimeout);
                 mouseTimeout = setTimeout(() => { mouseActive = false; }, 300);
 
-                // Reset the 3-second inactivity timer
                 clearTimeout(idleTimer);
                 idleTimer = setTimeout(() => {
                     isIdleSwirling = true;
@@ -477,16 +496,14 @@
                 targetX = x;
                 targetY = y;
                 
-                // If currently doing the auto-swirl, instantly snap back to cursor 
-                // so it doesn't draw a line connecting the swirl to the cursor.
                 if (isIdleSwirling) {
                     isIdleSwirling = false;
                     currentX = targetX;
                     currentY = targetY;
                 }
 
-                paraTargetX = (x - window.innerWidth / 2) / (window.innerWidth / 2);
-                paraTargetY = (y - window.innerHeight / 2) / (window.innerHeight / 2);
+                paraTargetX = (x - centerX) / centerX;
+                paraTargetY = (y - centerY) / centerY;
                 
                 setMouseActiveState();
             };
@@ -513,7 +530,6 @@
                         preloader.style.display = "none";
                         isAnimating = true;
                         
-                        // Kickoff the initial idle timer once loading finishes
                         idleTimer = setTimeout(() => {
                             isIdleSwirling = true;
                         }, 3000);
@@ -530,17 +546,12 @@
                 time += 0.1;
 
                 if (isIdleSwirling) {
-                    idleTime += 0.025; // Controls the speed of the auto-brush stroke
-                    
-                    // Complex Lissajous curve for natural, organic roaming movement
+                    idleTime += 0.025; 
                     targetX = centerX + Math.sin(idleTime * 1.3) * (centerX * 0.6) + Math.sin(idleTime * 2.8) * (centerX * 0.2);
                     targetY = centerY + Math.cos(idleTime * 0.9) * (centerY * 0.6) + Math.sin(idleTime * 2.1) * (centerY * 0.2);
 
-                    // Gentle parallax during auto-swirl
                     paraTargetX = ((targetX - centerX) / centerX) * 0.4;
                     paraTargetY = ((targetY - centerY) / centerY) * 0.4;
-
-                    // Force the mask to stay fully visible while swirling autonomously
                     maskFadeMultiplier = lerp(maskFadeMultiplier, 1, 0.05);
                 } else {
                     maskFadeMultiplier = lerp(maskFadeMultiplier, mouseActive ? 1 : 0, mouseActive ? 0.1 : 0.08);
@@ -556,7 +567,6 @@
                     if (distance > 30) {
                         activeDist = 30 + Math.sqrt(distance - 30) * 8; 
                     }
-                    
                     currentX += (dx / distance) * activeDist * LAG_FACTOR;
                     currentY += (dy / distance) * activeDist * LAG_FACTOR;
                 }
@@ -566,23 +576,23 @@
                     trail.pop();
                 }
 
-                if (frameCount % 2 === 0 && maskFadeMultiplier > 0.01) {
-                    let maskString = "";
-                    let len = trail.length;
+                // Batch SVG DOM Updates instead of CSS String Generation
+                let len = trail.length;
+                let dynamicRadius = MAIN_RADIUS * Math.pow(maskFadeMultiplier, 0.5);
+                
+                for (let i = 0; i < TRAIL_LENGTH; i++) {
+                    const circle = maskCircles[i];
                     
-                    let dynamicRadius = MAIN_RADIUS * Math.pow(maskFadeMultiplier, 0.5);
-                    
-                    for (let i = 0; i < len; i++) {
+                    if (i < len && maskFadeMultiplier > 0.01) {
                         let point = trail[i];
                         let progress = i / TRAIL_LENGTH;
-                        
                         let rawOpacity = Math.max(0, 1 - Math.pow(progress, 1.2));
-                        let opacity = (rawOpacity * maskFadeMultiplier);
+                        let opacity = (rawOpacity * maskFadeMultiplier).toFixed(2);
                         
-                        if (opacity < 0.02) continue; 
-                        
-                        let opacityStr = opacity.toFixed(2);
-                        let halfOpacityStr = (opacity * 0.5).toFixed(2);
+                        if (opacity < 0.02) {
+                            circle.setAttribute('r', '0');
+                            continue;
+                        }
                         
                         let baseSize = dynamicRadius + (Math.min(point.vel * 0.8, 30));
                         let ripple = Math.sin(i * 0.4 - time * 2) * (15 * (1 - progress));
@@ -594,22 +604,16 @@
                         let finalX = (point.x + wobbleX).toFixed(1);
                         let finalY = (point.y + wobbleY).toFixed(1);
 
-                        maskString += `radial-gradient(circle ${size}px at ${finalX}px ${finalY}px, rgba(0, 0, 0, ${opacityStr}) 15%, rgba(0, 0, 0, ${halfOpacityStr}) 45%, transparent 80%)`;
-                        
-                        if (i < len - 1) maskString += ", ";
+                        circle.setAttribute('cx', finalX);
+                        circle.setAttribute('cy', finalY);
+                        circle.setAttribute('r', size);
+                        circle.setAttribute('opacity', opacity);
+                    } else {
+                        circle.setAttribute('r', '0');
                     }
-
-                    if (maskString.endsWith(", ")) {
-                        maskString = maskString.slice(0, -2);
-                    }
-
-                    revealLayer.style.webkitMaskImage = maskString;
-                    revealLayer.style.maskImage = maskString;
-                } else if (maskFadeMultiplier <= 0.01) {
-                    revealLayer.style.webkitMaskImage = "radial-gradient(circle 0px at 50% 50%, transparent 100%)";
-                    revealLayer.style.maskImage = "radial-gradient(circle 0px at 50% 50%, transparent 100%)";
                 }
 
+                // Smooth Parallax Updates
                 paraCurrentX = lerp(paraCurrentX, paraTargetX, 0.05);
                 paraCurrentY = lerp(paraCurrentY, paraTargetY, 0.05);
 
