@@ -31,7 +31,7 @@
             width: 100vw;
             height: 100vh;
             overflow: hidden;
-            background-color: #ebebeb; /* Light gray base for smooth transition */
+            background-color: #ebebeb; 
             font-family: 'Instrument Serif', serif;
             overscroll-behavior: none;
             cursor: auto; 
@@ -406,12 +406,10 @@
         document.addEventListener("DOMContentLoaded", () => {
             const revealLayer = document.getElementById("revealLayer");
 
-            // Constraints optimized
             const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 768;
             const isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
 
             const MAIN_RADIUS = isMobile ? 60 : 100;
-            // Firefox struggles with heavy radial gradients, so we cap its trail length
             const TRAIL_LENGTH = isFirefox ? 25 : 80; 
             const LAG_FACTOR = 0.15;
             
@@ -431,6 +429,18 @@
             let paraTargetY = 0;
             let paraCurrentX = 0;
             let paraCurrentY = 0;
+
+            // Idle Animation Variables
+            let isIdleSwirling = false;
+            let idleTime = 0;
+            let idleTimer;
+            let centerX = window.innerWidth / 2;
+            let centerY = window.innerHeight / 2;
+
+            window.addEventListener('resize', () => {
+                centerX = window.innerWidth / 2;
+                centerY = window.innerHeight / 2;
+            });
 
             const bgs = document.querySelectorAll('.bg');
             const subjects = document.querySelectorAll('.subject-wrapper');
@@ -454,13 +464,30 @@
                 mouseActive = true;
                 clearTimeout(mouseTimeout);
                 mouseTimeout = setTimeout(() => { mouseActive = false; }, 300);
+
+                // Reset the 3-second inactivity timer
+                clearTimeout(idleTimer);
+                idleTimer = setTimeout(() => {
+                    isIdleSwirling = true;
+                    idleTime = 0;
+                }, 3000);
             };
 
             const updateTarget = (x, y) => {
                 targetX = x;
                 targetY = y;
+                
+                // If currently doing the auto-swirl, instantly snap back to cursor 
+                // so it doesn't draw a line connecting the swirl to the cursor.
+                if (isIdleSwirling) {
+                    isIdleSwirling = false;
+                    currentX = targetX;
+                    currentY = targetY;
+                }
+
                 paraTargetX = (x - window.innerWidth / 2) / (window.innerWidth / 2);
                 paraTargetY = (y - window.innerHeight / 2) / (window.innerHeight / 2);
+                
                 setMouseActiveState();
             };
 
@@ -485,6 +512,12 @@
                     setTimeout(() => {
                         preloader.style.display = "none";
                         isAnimating = true;
+                        
+                        // Kickoff the initial idle timer once loading finishes
+                        idleTimer = setTimeout(() => {
+                            isIdleSwirling = true;
+                        }, 3000);
+
                         animate(); 
                     }, 800); 
                 }, remaining);
@@ -496,19 +529,31 @@
                 frameCount++;
                 time += 0.1;
 
-                maskFadeMultiplier = lerp(maskFadeMultiplier, mouseActive ? 1 : 0, mouseActive ? 0.1 : 0.08);
+                if (isIdleSwirling) {
+                    idleTime += 0.025; // Controls the speed of the auto-brush stroke
+                    
+                    // Complex Lissajous curve for natural, organic roaming movement
+                    targetX = centerX + Math.sin(idleTime * 1.3) * (centerX * 0.6) + Math.sin(idleTime * 2.8) * (centerX * 0.2);
+                    targetY = centerY + Math.cos(idleTime * 0.9) * (centerY * 0.6) + Math.sin(idleTime * 2.1) * (centerY * 0.2);
+
+                    // Gentle parallax during auto-swirl
+                    paraTargetX = ((targetX - centerX) / centerX) * 0.4;
+                    paraTargetY = ((targetY - centerY) / centerY) * 0.4;
+
+                    // Force the mask to stay fully visible while swirling autonomously
+                    maskFadeMultiplier = lerp(maskFadeMultiplier, 1, 0.05);
+                } else {
+                    maskFadeMultiplier = lerp(maskFadeMultiplier, mouseActive ? 1 : 0, mouseActive ? 0.1 : 0.08);
+                }
 
                 let dx = targetX - currentX;
                 let dy = targetY - currentY;
                 let distance = Math.sqrt(dx*dx + dy*dy);
                 let velocity = distance;
 
-                // --- SOFT CAP LOGIC (Square Root compression for speed) ---
-                // If cursor moves very fast, clamp the maximum distance the trail head can jump
                 if (distance > 0) {
                     let activeDist = distance;
                     if (distance > 30) {
-                        // Square root function prevents trail from becoming infinitely long
                         activeDist = 30 + Math.sqrt(distance - 30) * 8; 
                     }
                     
@@ -534,7 +579,6 @@
                         let rawOpacity = Math.max(0, 1 - Math.pow(progress, 1.2));
                         let opacity = (rawOpacity * maskFadeMultiplier);
                         
-                        // SKIP rendering this circle if it's basically invisible (Saves Firefox from dying)
                         if (opacity < 0.02) continue; 
                         
                         let opacityStr = opacity.toFixed(2);
@@ -555,7 +599,6 @@
                         if (i < len - 1) maskString += ", ";
                     }
 
-                    // Clean up any trailing commas if the last item was skipped
                     if (maskString.endsWith(", ")) {
                         maskString = maskString.slice(0, -2);
                     }
