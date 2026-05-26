@@ -541,8 +541,8 @@
             const progress = maxScroll > 0 ? Math.min(1, Math.max(0, currentScroll / maxScroll)) : 0;
 
             let scrollDelta = targetScroll - currentScroll;
-            let autoSpeed = userHasScrolled ? 0 : 0.05;
-            let manualSpeed = userHasScrolled ? (scrollDelta * 0.001) : 0; // Throttled speed
+            let autoSpeed = userHasScrolled ? 0 : 0.005;
+            let manualSpeed = userHasScrolled ? (scrollDelta * 0.001) : 0; 
             
             marqueeMainOffset -= (autoSpeed + manualSpeed);
             marqueeSubOffset += (autoSpeed + manualSpeed) * 1.2;
