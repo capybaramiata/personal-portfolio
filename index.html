@@ -247,39 +247,29 @@
             display: flex; flex-direction: column; align-items: center; gap: 15px;
         }
 
-        /* Profile Picture */
-        .guest-pfp {
+        /* Profile Picture (Mobile Safari Fix: Replaced Background-Image with Img tag) */
+        .guest-pfp-wrapper {
             width: 120px; height: 120px; border-radius: 50%;
-            background-image: url('pfp.jpg');
-            background-size: cover;
-            background-position: center;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
             border: 2px solid rgba(255,255,255,0.2);
+            overflow: hidden;
+            display: flex; justify-content: center; align-items: center;
+            background-color: var(--mac-bg);
+        }
+        .guest-pfp-img {
+            width: 100%; height: 100%; object-fit: cover;
         }
         
         .avatar span { font-size: 1.2rem; font-weight: 600; letter-spacing: 0.5px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
 
         .mac-login-btn {
-            margin-top: 10px;
-            padding: 8px 30px;
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
-            font-family: var(--mac-font);
-            font-size: 0.95rem;
-            font-weight: 500;
-            cursor: pointer;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            margin-top: 10px; padding: 8px 30px; border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.3); background: rgba(255, 255, 255, 0.1);
+            color: #fff; font-family: var(--mac-font); font-size: 0.95rem; font-weight: 500;
+            cursor: pointer; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(0,0,0,0.15);
         }
-        .mac-login-btn:hover {
-            background: rgba(255, 255, 255, 0.25);
-            border-color: rgba(255, 255, 255, 0.5);
-            transform: scale(1.05);
-        }
+        .mac-login-btn:hover { background: rgba(255, 255, 255, 0.25); border-color: rgba(255, 255, 255, 0.5); transform: scale(1.05); }
 
         .desktop-view {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
@@ -381,6 +371,7 @@
 
         </div>
 
+        <!-- === MACOS SCENE (The Curtain) === -->
         <div id="macos-curtain" class="interactive">
             
             <div id="mac-bg" class="mac-bg-layer"></div>
@@ -388,7 +379,9 @@
 
             <div class="login-view" id="mac-login">
                 <div class="avatar">
-                    <div class="guest-pfp"></div>
+                    <div class="guest-pfp-wrapper">
+                        <img src="pfp.jpg" alt="Max Tianyu Wang" class="guest-pfp-img">
+                    </div>
                     <span>Max Tianyu Wang</span>
                 </div>
                 <button class="mac-login-btn" onclick="unlockDesktop()">Log In</button>
@@ -439,8 +432,10 @@
         let marqueeSubOffset = -25;
 
         const MAIN_RADIUS = isMobile ? 60 : 100;
-        const TRAIL_LENGTH = isFirefox ? 25 : 60; 
+        // Aggressively throttle trail length on mobile to save GPU cycles
+        const TRAIL_LENGTH = isMobile ? 15 : (isFirefox ? 25 : 60); 
         const LAG_FACTOR = 0.15;
+        
         let targetX = window.innerWidth / 2;
         let targetY = window.innerHeight / 2;
         let currentX = targetX;
@@ -455,6 +450,7 @@
         let centerY = window.innerHeight / 2;
         const trail = [];
 
+        // Cache DOM elements to prevent expensive lookups every frame
         const curtain = document.getElementById('macos-curtain');
         const loginView = document.getElementById('mac-login');
         const topNav = document.getElementById('top-nav');
@@ -462,6 +458,11 @@
         const subjects = document.querySelectorAll('.subject-wrapper');
         const revealLayer = document.getElementById("revealLayer");
         
+        const baseMainTrack = document.getElementById('base-main-track');
+        const revealMainTrack = document.getElementById('reveal-main-track');
+        const baseSubTrack = document.getElementById('base-sub-track');
+        const revealSubTrack = document.getElementById('reveal-sub-track');
+
         window.addEventListener('resize', () => {
             centerX = window.innerWidth / 2;
             centerY = window.innerHeight / 2;
@@ -507,9 +508,7 @@
         window.addEventListener("touchmove", (e) => updateTarget(e.touches[0].clientX, e.touches[0].clientY), { passive: true });
 
         window.unlockDesktop = function() {
-            // Expand the border-radius to 0px
             curtain.style.borderRadius = '0px';
-
             loginView.style.opacity = '0';
             loginView.style.transform = 'scale(1.1)';
             loginView.style.pointerEvents = 'none';
@@ -559,26 +558,32 @@
             const maxScroll = document.body.scrollHeight - window.innerHeight;
             const progress = maxScroll > 0 ? Math.min(1, Math.max(0, currentScroll / maxScroll)) : 0;
 
-            let scrollDelta = targetScroll - currentScroll;
-            let autoSpeed = userHasScrolled ? 0 : 0.005;
-            let manualSpeed = userHasScrolled ? (scrollDelta * 0.001) : 0; 
-            
-            marqueeMainOffset -= (autoSpeed + manualSpeed);
-            marqueeSubOffset += (autoSpeed + manualSpeed) * 1.2;
+            // Only update marquees if they are actually visible to save massive mobile battery
+            if (progress < 0.9) {
+                let scrollDelta = targetScroll - currentScroll;
+                let autoSpeed = userHasScrolled ? 0 : 0.005;
+                let manualSpeed = userHasScrolled ? (scrollDelta * 0.001) : 0; 
+                
+                marqueeMainOffset -= (autoSpeed + manualSpeed);
+                marqueeSubOffset += (autoSpeed + manualSpeed) * 1.2;
 
-            if (marqueeMainOffset <= -50) marqueeMainOffset += 50;
-            if (marqueeMainOffset > 0) marqueeMainOffset -= 50;
-            if (marqueeSubOffset >= 0) marqueeSubOffset -= 50;
-            if (marqueeSubOffset < -50) marqueeSubOffset += 50;
+                if (marqueeMainOffset <= -50) marqueeMainOffset += 50;
+                if (marqueeMainOffset > 0) marqueeMainOffset -= 50;
+                if (marqueeSubOffset >= 0) marqueeSubOffset -= 50;
+                if (marqueeSubOffset < -50) marqueeSubOffset += 50;
 
-            document.getElementById('base-main-track').style.transform = `translate3d(${marqueeMainOffset}%, -50%, 0)`;
-            document.getElementById('reveal-main-track').style.transform = `translate3d(${marqueeMainOffset}%, -50%, 0)`;
-            document.getElementById('base-sub-track').style.transform = `translate3d(${marqueeSubOffset}%, -50%, 0)`;
-            document.getElementById('reveal-sub-track').style.transform = `translate3d(${marqueeSubOffset}%, -50%, 0)`;
+                baseMainTrack.style.transform = `translate3d(${marqueeMainOffset}%, -50%, 0)`;
+                revealMainTrack.style.transform = `translate3d(${marqueeMainOffset}%, -50%, 0)`;
+                baseSubTrack.style.transform = `translate3d(${marqueeSubOffset}%, -50%, 0)`;
+                revealSubTrack.style.transform = `translate3d(${marqueeSubOffset}%, -50%, 0)`;
+            }
 
             let heroScale = 1 - (progress * 0.4);
             let heroY = progress * 80; 
-            subjects.forEach(sub => sub.style.transform = `translate3d(0, ${heroY}%, 0) scale(${heroScale})`);
+            
+            if (progress < 0.9) {
+                subjects.forEach(sub => sub.style.transform = `translate3d(0, ${heroY}%, 0) scale(${heroScale})`);
+            }
 
             let curtainY = 100;
             if (progress > 0.2) curtainY = Math.max(0, 100 - ((progress - 0.2) / 0.5) * 100);
@@ -593,6 +598,7 @@
                 loginView.style.opacity = loginOp;
             }
 
+            // Only calculate heavy mask trail if the Hero section is not completely covered
             if (progress < 0.6) {
                 if (isIdleSwirling) {
                     idleTime += 0.025; 
@@ -616,40 +622,41 @@
                 trail.unshift({ x: currentX, y: currentY, vel: dist });
                 if (trail.length > TRAIL_LENGTH) trail.pop();
 
-                let maskString = "";
                 let len = trail.length;
                 let dynamicRadius = MAIN_RADIUS * Math.pow(maskFadeMultiplier, 0.5);
+                
+                // Use array join instead of string concatenation for faster parsing
+                let maskParts = [];
                 
                 for (let i = 0; i < len; i++) {
                     let p = trail[i];
                     let prog = i / TRAIL_LENGTH;
                     let opacity = (Math.max(0, 1 - Math.pow(prog, 1.2)) * maskFadeMultiplier);
                     
-                    if (opacity < 0.02) continue; 
+                    if (opacity < 0.05) continue; 
                     
                     let opacityStr = opacity.toFixed(2);
                     let halfOpacityStr = (opacity * 0.5).toFixed(2);
                     
                     let baseSize = dynamicRadius + (Math.min(p.vel * 0.8, 30));
                     let ripple = Math.sin(i * 0.4 - time * 2) * (15 * (1 - prog));
-                    let size = Math.max(0, (baseSize * (1 - prog * 0.5)) + ripple).toFixed(1);
+                    // Math.round strips decimals, drastically speeding up browser CSS parsing
+                    let size = Math.round(Math.max(0, (baseSize * (1 - prog * 0.5)) + ripple));
                     
-                    let finalX = (p.x + Math.cos(i * 0.25 + time * 1.2) * (20 * prog)).toFixed(1);
-                    let finalY = (p.y + Math.sin(i * 0.3 - time * 1.5) * (20 * prog)).toFixed(1);
+                    let wobbleX = Math.cos(i * 0.25 + time * 1.2) * (20 * prog);
+                    let wobbleY = Math.sin(i * 0.3 - time * 1.5) * (20 * prog);
+                    
+                    let finalX = Math.round(p.x + wobbleX);
+                    let finalY = Math.round(p.y + wobbleY);
 
-                    maskString += `radial-gradient(circle ${size}px at ${finalX}px ${finalY}px, rgba(0, 0, 0, ${opacityStr}) 15%, rgba(0, 0, 0, ${halfOpacityStr}) 45%, transparent 80%)`;
-                    
-                    if (i < len - 1) maskString += ", ";
+                    maskParts.push(`radial-gradient(circle ${size}px at ${finalX}px ${finalY}px, rgba(0,0,0,${opacityStr}) 15%, rgba(0,0,0,${halfOpacityStr}) 45%, transparent 80%)`);
                 }
 
-                if (maskString.endsWith(", ")) {
-                    maskString = maskString.slice(0, -2);
-                }
-
-                if (maskString === "") {
+                if (maskParts.length === 0) {
                     revealLayer.style.webkitMaskImage = emptyMask;
                     revealLayer.style.maskImage = emptyMask;
                 } else {
+                    let maskString = maskParts.join(",");
                     revealLayer.style.webkitMaskImage = maskString;
                     revealLayer.style.maskImage = maskString;
                 }
