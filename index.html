@@ -20,125 +20,208 @@
     <style>
         /* === CSS Custom Properties === */
         :root {
+            /* Colors */
             --bg-base-light: #ebebeb;
             --bg-base-dark: #000;
+            
             --text-main-light: #000;
             --text-main-dark: #fff;
+            
             --text-sub-light: #444;
             --text-sub-dark: #ddd;
+            
             --text-sub-light-alt: #bbb;
             --text-sub-dark-alt: #222;
 
+            /* Dimensions & Timing */
             --pad: 40px;
             --icon-size: 24px;
             --transition: 0.6s ease-in-out;
             --font-serif: 'Instrument Serif', serif;
             --font-display: 'Plaster', serif;
-            
-            --mac-bg: #111111;
-            --mac-text: #ffffff;
-            --mac-font: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        /* === Reset & Base Styles === */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
         body, html {
             width: 100vw;
-            height: 300vh; /* Virtual scroll timeline */
+            height: 100vh;
+            overflow: hidden;
             background-color: var(--bg-base-light); 
             font-family: var(--font-serif);
+            overscroll-behavior: none;
+            cursor: auto; 
             transition: background-color var(--transition);
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-        }
-        body::-webkit-scrollbar { display: none; }
-
-        body.dark-mode { background-color: var(--bg-base-dark); }
-
-        /* === App Container (Fixed Renderer) === */
-        #app-container {
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            overflow: hidden; pointer-events: none; 
         }
 
-        .interactive { pointer-events: auto; }
+        body.dark-mode {
+            background-color: var(--bg-base-dark);
+        }
 
         /* === Preloader === */
         #preloader {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background-color: var(--bg-base-dark); z-index: 9999;
-            display: flex; justify-content: center; align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: var(--bg-base-dark);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             transition: opacity 0.8s ease-in-out;
+            pointer-events: none;
         }
-        #preloader img { width: 200px; height: 200px; object-fit: contain; }
-        @media (max-width: 768px) { #preloader img { width: 120px; height: 120px; } }
 
-        /* === Core Architecture Layers === */
+        #preloader img {
+            width: 200px;
+            height: 200px;
+            object-fit: contain;
+        }
+
+        @media (max-width: 768px) {
+            #preloader img {
+                width: 120px;
+                height: 120px;
+            }
+        }
+
+        /* === Core Architecture === */
+        .reveal-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+
         .layer {
-            position: absolute; top: 0; left: 0; width: 100vw; height: 100vh;
-            will-change: transform;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
         }
 
+        /* Hardware Accelerated Layering */
         .base-layer { z-index: 1; }
         
         .reveal-layer {
             z-index: 2;
-            -webkit-mask-image: radial-gradient(circle 0px at 50% 50%, transparent 100%);
-            mask-image: radial-gradient(circle 0px at 50% 50%, transparent 100%);
-            -webkit-mask-repeat: no-repeat;
-            mask-repeat: no-repeat;
-            will-change: mask-image, -webkit-mask-image;
-            transform: translateZ(0); 
+            transform: translateZ(0); /* Force GPU compositing layer */
         }
 
-        /* === Backgrounds & Subjects === */
+        /* === Backgrounds === */
         .layer-img {
-            position: absolute; top: -5%; left: -5%; width: 110%; height: 110%;
-            object-fit: cover; object-position: center; transform-origin: center;
-            will-change: transform; transition: filter var(--transition);
+            position: absolute;
+            top: -5%;
+            left: -5%;
+            width: 110%;
+            height: 110%;
+            object-fit: cover;
+            object-position: center;
+            transform-origin: center;
+            will-change: transform;
+            transition: filter var(--transition);
         }
 
-        .reveal-layer .bg { filter: brightness(0.4) contrast(1.3); }
+        .reveal-layer .bg {
+            filter: brightness(0.4) contrast(1.3);
+        }
+
         body.dark-mode .base-layer .bg { filter: brightness(0.25) contrast(1.2); }
         body.dark-mode .reveal-layer .bg { filter: none; }
 
+        /* === Subjects === */
         .subject-wrapper {
-            position: absolute; top: -5%; left: -5%; width: 110%; height: 110%;
-            display: flex; justify-content: center; align-items: flex-end;
-            will-change: transform; z-index: 2;
+            position: absolute;
+            top: -5%;
+            left: -5%;
+            width: 110%;
+            height: 110%;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            will-change: transform;
+            z-index: 2;
         }
 
         .subject-img {
-            height: 90%; width: auto; object-fit: contain;
-            transform-origin: bottom center; position: absolute;
+            height: 90%;
+            width: auto;
+            object-fit: contain;
+            transform-origin: bottom center;
+            position: absolute;
             transition: opacity var(--transition);
         }
 
-        .img-light { opacity: 1; } .img-dark { opacity: 0; }
-        body.dark-mode .img-light { opacity: 0; } body.dark-mode .img-dark { opacity: 1; }
-        .reveal-layer .img-light { opacity: 0; } .reveal-layer .img-dark { opacity: 1; }
-        body.dark-mode .reveal-layer .img-light { opacity: 1; } body.dark-mode .reveal-layer .img-dark { opacity: 0; }
+        .img-light { opacity: 1; }
+        .img-dark { opacity: 0; }
+        body.dark-mode .img-light { opacity: 0; }
+        body.dark-mode .img-dark { opacity: 1; }
+
+        .reveal-layer .img-light { opacity: 0; }
+        .reveal-layer .img-dark { opacity: 1; }
+        body.dark-mode .reveal-layer .img-light { opacity: 1; }
+        body.dark-mode .reveal-layer .img-dark { opacity: 0; }
 
         /* === Marquee Text === */
         .scroll-text-wrapper {
-            position: absolute; left: 0; width: 100%; overflow: hidden;
-            z-index: 1; will-change: transform; pointer-events: none;
+            position: absolute;
+            left: 0;
+            width: 100%;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 1;
+            will-change: transform;
         }
 
-        .main-track-wrapper { top: 48%; height: 5.2rem; }
-        .sub-track-wrapper { top: 32%; height: 4.8rem; }
+        .main-track-wrapper {
+            top: 48%;
+            height: 5.2rem;
+        }
+
+        .sub-track-wrapper {
+            top: 38%;
+            height: 4.8rem;
+        }
 
         .scroll-text-track {
-            position: absolute; top: 50%; left: 0; display: inline-flex; white-space: nowrap;
-            font-family: var(--font-display); font-weight: 700; text-transform: uppercase;
-            transform: translate3d(-50%, -50%, 0); will-change: transform;
+            position: absolute;
+            top: 50%;
+            left: 0;
+            display: inline-flex;
+            white-space: nowrap;
+            font-family: var(--font-display);
+            font-weight: 700;
+            text-transform: uppercase;
+            transform: translate3d(-50%, -50%, 0);
+            will-change: transform;
         }
 
-        .scroll-text-item { display: inline-block; }
-        .scroll-text-track.main { font-size: 7rem; letter-spacing: 0.1em; }
-        .scroll-text-track.sub { font-size: 5.5rem; letter-spacing: 0.15em; }
+        .scroll-text-item {
+            display: inline-block;
+        }
 
+        /* Typography Tracking */
+        .scroll-text-track.main {
+            font-size: 7rem;
+            letter-spacing: 0.1em;
+            animation: scrollRight 100s linear infinite;
+        }
+
+        .scroll-text-track.sub {
+            font-size: 5.5rem; 
+            letter-spacing: 0.15em; 
+            animation: scrollLeft 140s linear infinite;
+        }
+
+        /* Dynamic Colors for Base/Reveal Tracks */
         .text-main-base { color: var(--text-main-light); }
         .text-main-reveal { color: var(--text-main-dark); }
         body.dark-mode .text-main-base { color: var(--text-main-dark); }
@@ -149,48 +232,30 @@
         body.dark-mode .text-sub-base { color: var(--text-sub-light-alt); }
         body.dark-mode .text-sub-reveal { color: var(--text-sub-dark-alt); }
 
-        /* === Scroll Indicator === */
-        #scroll-indicator {
-            position: absolute; bottom: var(--pad); left: var(--pad);
-            display: flex; flex-direction: column; align-items: center; gap: 15px;
-            opacity: 0; transition: opacity 0.8s ease; z-index: 10; pointer-events: none;
+        @keyframes scrollRight {
+            0% { transform: translate3d(-50%, -50%, 0); }
+            100% { transform: translate3d(0, -50%, 0); }
         }
 
-        #scroll-indicator span {
-            writing-mode: vertical-rl; text-orientation: mixed;
-            font-size: 12px; letter-spacing: 2px; font-weight: 600; color: var(--text-main-light);
-        }
-        body.dark-mode #scroll-indicator span { color: var(--text-main-dark); }
-
-        .slider-track {
-            width: 1px; height: 60px; background-color: rgba(150, 150, 150, 0.3);
-            position: relative; overflow: hidden;
+        @keyframes scrollLeft {
+            0% { transform: translate3d(0, -50%, 0); }
+            100% { transform: translate3d(-50%, -50%, 0); }
         }
 
-        .slider-thumb {
-            width: 100%; height: 20px; background-color: var(--text-main-light);
-            position: absolute; top: 0; animation: scrollSlider 2s cubic-bezier(0.65, 0, 0.35, 1) infinite;
-        }
-        body.dark-mode .slider-thumb { background-color: var(--text-main-dark); }
-
-        @keyframes scrollSlider {
-            0% { transform: translateY(-100%); opacity: 0; }
-            50% { opacity: 1; }
-            100% { transform: translateY(300%); opacity: 0; }
-        }
-
-        @media (max-width: 768px) {
-            #scroll-indicator span { color: #fff !important; }
-            .slider-track { background-color: rgba(255, 255, 255, 0.3) !important; }
-            .slider-thumb { background-color: #fff !important; }
-        }
-
-        /* === Navigation === */
+        /* === Navigation & UI === */
         .nav-container {
-            position: absolute; top: var(--pad); left: var(--pad); right: var(--pad);
-            display: flex; justify-content: space-between;
-            font-size: 14px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;
-            pointer-events: none; z-index: 200; transition: color 0.4s ease;
+            position: absolute;
+            top: var(--pad);
+            left: var(--pad);
+            right: var(--pad);
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            pointer-events: none;
+            z-index: 200;
         }
 
         .nav-base { color: var(--text-main-light); z-index: 3; }
@@ -198,475 +263,532 @@
         body.dark-mode .nav-base { color: var(--text-main-dark); }
         body.dark-mode .nav-reveal { color: var(--text-main-light); }
 
-        #top-nav { color: var(--text-main-light); }
-        body.dark-mode #top-nav { color: var(--text-main-dark); }
-        #top-nav.nav-inverted { color: #fff !important; }
+        nav > div { pointer-events: auto; }
 
-        #top-nav > div { pointer-events: auto; }
-        
-        #dark-mode-toggle { cursor: pointer; display: flex; align-items: center; justify-content: center; width: var(--icon-size); height: var(--icon-size); }
-        .toggle-icon { position: relative; width: var(--icon-size); height: var(--icon-size); }
-        .toggle-icon svg { position: absolute; top: 0; left: 0; width: var(--icon-size); height: var(--icon-size); stroke: currentColor; transition: all 0.5s ease; }
+        /* === Theme Toggle Icons === */
+        #dark-mode-toggle {
+            cursor: pointer;
+            pointer-events: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: var(--icon-size);
+            height: var(--icon-size);
+        }
+
+        .toggle-icon {
+            position: relative;
+            width: var(--icon-size);
+            height: var(--icon-size);
+        }
+
+        .toggle-icon svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: var(--icon-size);
+            height: var(--icon-size);
+            stroke: currentColor;
+            transition: all 0.5s ease;
+        }
+
         .icon-moon { opacity: 1; transform: rotate(0) scale(1); }
         .icon-sun { opacity: 0; transform: rotate(-90deg) scale(0.5); }
         body.dark-mode .icon-moon { opacity: 0; transform: rotate(90deg) scale(0.5); }
         body.dark-mode .icon-sun { opacity: 1; transform: rotate(0) scale(1); }
 
-        /* === macOS Curtain & Scenes === */
-        #macos-curtain {
-            position: absolute; top: 0; left: 0; width: 100vw; height: 100vh;
-            z-index: 50; transform: translateY(100%); will-change: transform;
-            display: flex; justify-content: center; align-items: center;
-            font-family: var(--mac-font); color: var(--mac-text);
-            border-radius: 30px 30px 0 0;
-            overflow: hidden;
-            box-shadow: 0 -20px 50px rgba(0,0,0,0.5);
-            transition: border-radius 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+        /* === macOS Dock === */
+        .dock {
+            width: auto;
+            height: 60px;
+            border-radius: 16px;
+            display: flex;
+            justify-content: center;
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            pointer-events: auto; /* Ensure it's clickable above the mask */
         }
 
-        .mac-bg-layer {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background-size: cover; background-position: center;
-            z-index: 0; transition: opacity 0.8s ease, background-image 0.6s ease;
+        .dock-container {
+            padding: 3px 10px;
+            width: auto;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 16px;
+            background: rgba(83, 83, 83, 0.25);
+            backdrop-filter: blur(13px);
+            -webkit-backdrop-filter: blur(13px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+
+        .dock-container li {
+            list-style: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+            vertical-align: bottom;
+            transition: 0.2s;
+            transform-origin: 50% 100%;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .dock-container li:hover {
+            margin: 0px 13px 0px 13px;
+        }
+
+        .dock-container li .name {
+            position: absolute;
+            top: -55px;
+            background: rgba(0, 0, 0, 0.5);
+            color: rgba(255, 255, 255, 0.9);
+            height: auto;
+            padding: 6px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 5px;
+            visibility: hidden;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+
+        .dock-container li .name::after {
+            content: "";
+            position: absolute;
+            bottom: -8px;
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-top: 8px solid rgba(0, 0, 0, 0.5);
+        }
+
+        .dock-container li:hover .name {
+            visibility: visible;
+        }
+
+        .dock-container li .ico {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: inline-block;
+            transition: transform 0.3s ease;
         }
         
-        #mac-bg { background-image: url('bg.jpg'); opacity: 1; }
-        #mac-blur { background-image: url('bgBlur.jpg'); opacity: 1; }
-
-        /* Dark Mode Backgrounds */
-        body.dark-mode #mac-bg { background-image: url('dBg.jpg'); }
-        body.dark-mode #mac-blur { background-image: url('dBgBlur.jpg'); }
-
-        .login-view {
-            position: relative; z-index: 10;
-            display: flex; flex-direction: column; align-items: center; gap: 15px;
-            transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1); opacity: 0;
+        /* Optional indicator dot for Finder */
+        .dock-container .li-finder::after {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            content: "";
+            bottom: 0px;
         }
-
-        .avatar {
-            display: flex; flex-direction: column; align-items: center; gap: 15px;
-        }
-
-        /* Profile Picture (Mobile Safari Fix: Replaced Background-Image with Img tag) */
-        .guest-pfp-wrapper {
-            width: 120px; height: 120px; border-radius: 50%;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            border: 2px solid rgba(255,255,255,0.2);
-            overflow: hidden;
-            display: flex; justify-content: center; align-items: center;
-            background-color: var(--mac-bg);
-        }
-        .guest-pfp-img {
-            width: 100%; height: 100%; object-fit: cover;
-        }
-        
-        .avatar span { font-size: 1.2rem; font-weight: 600; letter-spacing: 0.5px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
-
-        .mac-login-btn {
-            margin-top: 10px; padding: 8px 30px; border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.3); background: rgba(255, 255, 255, 0.1);
-            color: #fff; font-family: var(--mac-font); font-size: 0.95rem; font-weight: 500;
-            cursor: pointer; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-            transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-        }
-        .mac-login-btn:hover { background: rgba(255, 255, 255, 0.25); border-color: rgba(255, 255, 255, 0.5); transform: scale(1.05); }
-
-        .desktop-view {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            padding: 100px 60px; opacity: 0; pointer-events: none; z-index: 10;
-            transform: scale(1.05); transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
-            display: flex; flex-direction: column; align-content: flex-end; flex-wrap: wrap; gap: 30px;
-        }
-
-        .mac-folder {
-            display: flex; flex-direction: column; align-items: center; gap: 8px; width: 80px;
-            cursor: pointer; transition: transform 0.2s ease;
-        }
-        .mac-folder:hover { transform: scale(1.1); }
-        .mac-folder svg { width: 60px; height: 60px; fill: #73bcf8; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3)); }
-        .mac-folder span { font-size: 0.75rem; font-weight: 500; background: rgba(0,0,0,0.4); padding: 2px 6px; border-radius: 4px; backdrop-filter: blur(4px); }
-
     </style>
+    
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org/",
+        "@type": "Person",
+        "name": "Max Tianyu Wang",
+        "url": "https://mtyw.ca",
+        "image": "https://mtyw.ca/IMG_0336.PNG",
+        "jobTitle": "Student & Creator",
+        "sameAs": [
+            "https://github.com/capybaramiata",
+            "https://linkedin.com/in/maxtianyuwang"
+        ]
+    }
+    </script>
 </head>
 <body>
 
+    <!-- PRELOADER -->
     <div id="preloader">
-        <img src="logo.gif" alt="Loading">
+        <img src="logo.gif" alt="Max Tianyu Wang portfolio loading animation">
     </div>
 
-    <div id="app-container">
+    <div class="reveal-container">
         
-        <div id="hero-scene" class="layer">
+        <!-- ==========================================
+             BASE LAYER (Default Visiblity & SEO)
+        =========================================== -->
+        <div class="layer base-layer">
+            <img src="IMG_0337.PNG" alt="Background image of Max Tianyu Wang's photography portfolio" class="layer-img bg">
             
-            <div class="layer base-layer">
-                <img src="IMG_0337.PNG" class="layer-img bg">
-                
-                <div class="nav-container nav-base">
-                    <div>Max Tianyu Wang</div>
-                    <div>
-                        <div class="toggle-icon">
-                            <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
-                            <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
-                        </div>
+            <div class="nav-container nav-base">
+                <div>Max Tianyu Wang</div>
+                <div id="dark-mode-toggle">
+                    <div class="toggle-icon">
+                        <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+                        <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
                     </div>
-                </div>
-
-                <div class="scroll-text-wrapper sub-track-wrapper">
-                    <div class="scroll-text-track sub text-sub-base" id="base-sub-track">
-                        <span class="scroll-text-item">PHOTOGRAPHER · VIDEOGRAPHER · FILMMAKER · CREATOR · CAD DESIGNER · MUN PRESIDENT · PRIME MINISTER · PROGRAMMER · SPEAKER · LEADER · GRAPHIC DESIGNER · SKI INSTRUCTOR · ROBOTICS LEAD ·&nbsp;</span>
-                        <span class="scroll-text-item">PHOTOGRAPHER · VIDEOGRAPHER · FILMMAKER · CREATOR · CAD DESIGNER · MUN PRESIDENT · PRIME MINISTER · PROGRAMMER · SPEAKER · LEADER · GRAPHIC DESIGNER · SKI INSTRUCTOR · ROBOTICS LEAD ·&nbsp;</span>
-                    </div>
-                </div>
-
-                <div class="scroll-text-wrapper main-track-wrapper">
-                    <div class="scroll-text-track main text-main-base" id="base-main-track">
-                        <span class="scroll-text-item">MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;</span>
-                        <span class="scroll-text-item">MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;</span>
-                    </div>
-                </div>
-
-                <div class="subject-wrapper subject">
-                    <img src="IMG_0336.PNG" class="subject-img img-light">
-                    <img src="IMG_0335.PNG" class="subject-img img-dark">
-                </div>
-            </div>
-
-            <div class="layer reveal-layer" id="revealLayer">
-                <img src="IMG_0337.PNG" class="layer-img bg" alt="">
-                
-                <div class="nav-container nav-reveal">
-                    <div>Max Tianyu Wang</div>
-                    <div style="pointer-events: none;">
-                        <div class="toggle-icon">
-                            <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
-                            <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="scroll-text-wrapper sub-track-wrapper">
-                    <div class="scroll-text-track sub text-sub-reveal" id="reveal-sub-track">
-                        <span class="scroll-text-item">PHOTOGRAPHER · VIDEOGRAPHER · FILMMAKER · CREATOR · CAD DESIGNER · MUN PRESIDENT · PRIME MINISTER · PROGRAMMER · SPEAKER · LEADER · GRAPHIC DESIGNER · SKI INSTRUCTOR · ROBOTICS LEAD ·&nbsp;</span>
-                        <span class="scroll-text-item">PHOTOGRAPHER · VIDEOGRAPHER · FILMMAKER · CREATOR · CAD DESIGNER · MUN PRESIDENT · PRIME MINISTER · PROGRAMMER · SPEAKER · LEADER · GRAPHIC DESIGNER · SKI INSTRUCTOR · ROBOTICS LEAD ·&nbsp;</span>
-                    </div>
-                </div>
-
-                <div class="scroll-text-wrapper main-track-wrapper">
-                    <div class="scroll-text-track main text-main-reveal" id="reveal-main-track">
-                        <span class="scroll-text-item">MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;</span>
-                        <span class="scroll-text-item">MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;</span>
-                    </div>
-                </div>
-
-                <div class="subject-wrapper subject">
-                    <img src="IMG_0336.PNG" class="subject-img img-light" alt="">
-                    <img src="IMG_0335.PNG" class="subject-img img-dark" alt="">
                 </div>
             </div>
             
-            <div id="scroll-indicator">
-                <span>SCROLL</span>
-                <div class="slider-track"><div class="slider-thumb"></div></div>
+            <div class="scroll-text-wrapper sub-track-wrapper">
+                <div class="scroll-text-track sub text-sub-base">
+                    <span class="scroll-text-item">PHOTOGRAPHER · VIDEOGRAPHER · FILMMAKER · CREATOR · CAD DESIGNER · MUN PRESIDENT · PRIME MINISTER · PROGRAMMER · SPEAKER · LEADER · GRAPHIC DESIGNER · SKI INSTRUCTOR · ROBOTICS LEAD ·&nbsp;</span>
+                    <span class="scroll-text-item">PHOTOGRAPHER · VIDEOGRAPHER · FILMMAKER · CREATOR · CAD DESIGNER · MUN PRESIDENT · PRIME MINISTER · PROGRAMMER · SPEAKER · LEADER · GRAPHIC DESIGNER · SKI INSTRUCTOR · ROBOTICS LEAD ·&nbsp;</span>
+                </div>
             </div>
 
+            <div class="scroll-text-wrapper main-track-wrapper">
+                <div class="scroll-text-track main text-main-base">
+                    <span class="scroll-text-item">MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;</span>
+                    <span class="scroll-text-item">MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;</span>
+                </div>
+            </div>
+
+            <div class="subject-wrapper subject">
+                <img src="IMG_0336.PNG" alt="Portrait of Max Tianyu Wang in light mode" class="subject-img img-light">
+                <img src="IMG_0335.PNG" alt="Artistic illustration of Max Tianyu Wang in dark mode" class="subject-img img-dark">
+            </div>
         </div>
 
-        <!-- === MACOS SCENE (The Curtain) === -->
-        <div id="macos-curtain" class="interactive">
-            
-            <div id="mac-bg" class="mac-bg-layer"></div>
-            <div id="mac-blur" class="mac-bg-layer"></div>
+        <!-- ==========================================
+             REVEAL LAYER (SVG with ForeignObject Mask)
+        =========================================== -->
+        <svg class="layer reveal-layer" id="revealLayer" aria-hidden="true" width="100%" height="100%" preserveAspectRatio="none">
+            <defs>
+                <radialGradient id="soft-brush">
+                    <stop offset="15%" stop-color="white" stop-opacity="1" />
+                    <stop offset="45%" stop-color="white" stop-opacity="0.5" />
+                    <stop offset="80%" stop-color="white" stop-opacity="0" />
+                </radialGradient>
+                
+                <mask id="cursor-mask" maskUnits="userSpaceOnUse" x="-50%" y="-50%" width="200%" height="200%">
+                    <rect width="100%" height="100%" fill="black" />
+                    <!-- Circles injected dynamically via JS -->
+                    <g id="mask-elements"></g>
+                </mask>
+            </defs>
 
-            <div class="login-view" id="mac-login">
-                <div class="avatar">
-                    <div class="guest-pfp-wrapper">
-                        <img src="pfp.jpg" alt="Max Tianyu Wang" class="guest-pfp-img">
+            <foreignObject width="100%" height="100%" mask="url(#cursor-mask)">
+                <!-- Strict XML requires xmlns and strictly self-closed elements like <img/> and &#160; -->
+                <div xmlns="http://www.w3.org/1999/xhtml" style="width: 100vw; height: 100vh; position: absolute; top: 0; left: 0;">
+                    <img src="IMG_0337.PNG" class="layer-img bg" alt="" />
+                    
+                    <div class="nav-container nav-reveal">
+                        <div>Max Tianyu Wang</div>
+                        <div class="theme-toggle-reveal" style="pointer-events: none;">
+                            <div class="toggle-icon">
+                                <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+                                <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+                            </div>
+                        </div>
                     </div>
-                    <span>Max Tianyu Wang</span>
-                </div>
-                <button class="mac-login-btn" onclick="unlockDesktop()">Log In</button>
-            </div>
+                    
+                    <div class="scroll-text-wrapper sub-track-wrapper">
+                        <div class="scroll-text-track sub text-sub-reveal">
+                            <span class="scroll-text-item">PHOTOGRAPHER · VIDEOGRAPHER · FILMMAKER · CREATOR · CAD DESIGNER · MUN PRESIDENT · PRIME MINISTER · PROGRAMMER · SPEAKER · LEADER · GRAPHIC DESIGNER · SKI INSTRUCTOR · ROBOTICS LEAD ·&#160;</span>
+                            <span class="scroll-text-item">PHOTOGRAPHER · VIDEOGRAPHER · FILMMAKER · CREATOR · CAD DESIGNER · MUN PRESIDENT · PRIME MINISTER · PROGRAMMER · SPEAKER · LEADER · GRAPHIC DESIGNER · SKI INSTRUCTOR · ROBOTICS LEAD ·&#160;</span>
+                        </div>
+                    </div>
 
-            <div class="desktop-view" id="mac-desktop">
-                <div class="mac-folder">
-                    <svg viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>
-                    <span>ABOUT</span>
-                </div>
-                <div class="mac-folder">
-                    <svg viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>
-                    <span>PHOTO</span>
-                </div>
-                <div class="mac-folder">
-                    <svg viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>
-                    <span>CREATIONS</span>
-                </div>
-                <div class="mac-folder">
-                    <svg viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>
-                    <span>SOCIALS</span>
-                </div>
-            </div>
+                    <div class="scroll-text-wrapper main-track-wrapper">
+                        <div class="scroll-text-track main text-main-reveal">
+                            <span class="scroll-text-item">MAX TIANYU WANG&#160;MAX TIANYU WANG&#160;MAX TIANYU WANG&#160;MAX TIANYU WANG&#160;MAX TIANYU WANG&#160;MAX TIANYU WANG&#160;MAX TIANYU WANG&#160;MAX TIANYU WANG&#160;</span>
+                            <span class="scroll-text-item">MAX TIANYU WANG&#160;MAX TIANYU WANG&#160;MAX TIANYU WANG&#160;MAX TIANYU WANG&#160;MAX TIANYU WANG&#160;MAX TIANYU WANG&#160;MAX TIANYU WANG&#160;MAX TIANYU WANG&#160;</span>
+                        </div>
+                    </div>
 
-        </div>
-
-        <nav id="top-nav" class="nav-container interactive">
-            <div style="visibility: hidden;">Max Tianyu Wang</div>
-            <div id="dark-mode-toggle">
-                <div class="toggle-icon">
-                    <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
-                    <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+                    <div class="subject-wrapper subject">
+                        <img src="IMG_0336.PNG" class="subject-img img-light" alt="" />
+                        <img src="IMG_0335.PNG" class="subject-img img-dark" alt="" />
+                    </div>
                 </div>
-            </div>
-        </nav>
+            </foreignObject>
+        </svg>
 
+    </div>
+
+    <!-- === MACOS DOCK === -->
+    <div class="dock">
+        <ul class="dock-container">
+            <li class="li-finder">
+                <div class="name">About</div>
+                <img class="ico" src="https://uploads-ssl.webflow.com/5f7081c044fb7b3321ac260e/5f70853981255cc36b3a37af_finder.png" alt="Finder">
+            </li>
+            <li>
+                <div class="name">Photos</div>
+                <img class="ico" src="https://uploads-ssl.webflow.com/5f7081c044fb7b3321ac260e/5f70853c55558a2e1192ee09_photos.png" alt="Photos">
+            </li>
+            <li>
+                <div class="name">Portfolio</div>
+                <img class="ico" src="https://uploads-ssl.webflow.com/5f7081c044fb7b3321ac260e/5f70853c849ec3735b52cef9_notes.png" alt="Notes">
+            </li>
+            <li>
+                <div class="name">Creations</div>
+                <img class="ico" src="https://uploads-ssl.webflow.com/5f7081c044fb7b3321ac260e/5f70853270b5e2ccfd795b49_appstore.png" alt="App Store">
+            </li>
+            <li>
+                <div class="name">Socials</div>
+                <img class="ico" src="https://uploads-ssl.webflow.com/5f7081c044fb7b3321ac260e/5f70853743597518c528b9b3_contacts.png" alt="Contacts">
+            </li>
+        </ul>
     </div>
 
     <script>
-        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 768;
-        const isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+        document.addEventListener("DOMContentLoaded", () => {
+            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 768;
+            const isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
 
-        let currentScroll = 0;
-        let targetScroll = 0;
-        let userHasScrolled = false;
+            const MAIN_RADIUS = isMobile ? 60 : 100;
+            const TRAIL_LENGTH = isFirefox ? 25 : 60; 
+            const LAG_FACTOR = 0.15;
+            
+            let targetX = window.innerWidth / 2;
+            let targetY = window.innerHeight / 2;
+            let currentX = targetX;
+            let currentY = targetY;
+            let time = 0;
+            let frameCount = 0; 
+            let isAnimating = false;
 
-        let marqueeMainOffset = -25; 
-        let marqueeSubOffset = -25;
+            let mouseActive = false;
+            let mouseTimeout;
+            let maskFadeMultiplier = 0;
 
-        const MAIN_RADIUS = isMobile ? 60 : 100;
-        // Aggressively throttle trail length on mobile to save GPU cycles
-        const TRAIL_LENGTH = isMobile ? 15 : (isFirefox ? 25 : 60); 
-        const LAG_FACTOR = 0.15;
-        
-        let targetX = window.innerWidth / 2;
-        let targetY = window.innerHeight / 2;
-        let currentX = targetX;
-        let currentY = targetY;
-        let time = 0;
-        let isAnimating = false;
-        let mouseActive = false;
-        let maskFadeMultiplier = 0;
-        let isIdleSwirling = false;
-        let idleTime = 0;
-        let centerX = window.innerWidth / 2;
-        let centerY = window.innerHeight / 2;
-        const trail = [];
+            let paraTargetX = 0;
+            let paraTargetY = 0;
+            let paraCurrentX = 0;
+            let paraCurrentY = 0;
 
-        // Cache DOM elements to prevent expensive lookups every frame
-        const curtain = document.getElementById('macos-curtain');
-        const loginView = document.getElementById('mac-login');
-        const topNav = document.getElementById('top-nav');
-        const scrollIndicator = document.getElementById('scroll-indicator');
-        const subjects = document.querySelectorAll('.subject-wrapper');
-        const revealLayer = document.getElementById("revealLayer");
-        
-        const baseMainTrack = document.getElementById('base-main-track');
-        const revealMainTrack = document.getElementById('reveal-main-track');
-        const baseSubTrack = document.getElementById('base-sub-track');
-        const revealSubTrack = document.getElementById('reveal-sub-track');
+            // Idle Animation Variables
+            let isIdleSwirling = false;
+            let idleTime = 0;
+            let idleTimer;
+            let centerX = window.innerWidth / 2;
+            let centerY = window.innerHeight / 2;
 
-        window.addEventListener('resize', () => {
-            centerX = window.innerWidth / 2;
-            centerY = window.innerHeight / 2;
-        });
+            window.addEventListener('resize', () => {
+                centerX = window.innerWidth / 2;
+                centerY = window.innerHeight / 2;
+            });
 
-        document.getElementById("dark-mode-toggle").addEventListener("click", () => {
-            document.body.classList.toggle('dark-mode');
-        });
+            // Parallax Elements
+            const bgs = document.querySelectorAll('.bg');
+            const subjects = document.querySelectorAll('.subject-wrapper');
+            const scrollWrappers = document.querySelectorAll('.scroll-text-wrapper');
 
-        window.addEventListener('scroll', () => {
-            targetScroll = window.scrollY;
-            if (targetScroll < 5) {
-                userHasScrolled = false;
-                scrollIndicator.style.opacity = '1';
-            } else if (!userHasScrolled && targetScroll > 10) {
-                userHasScrolled = true;
-                scrollIndicator.style.opacity = '0';
+            // Theme Toggle
+            let isDarkMode = false;
+            const toggle = document.getElementById("dark-mode-toggle");
+            toggle.addEventListener("click", () => {
+                isDarkMode = !isDarkMode;
+                document.body.classList.toggle('dark-mode', isDarkMode);
+            });
+
+            // SVG Mask Initialization
+            const maskGroup = document.getElementById('mask-elements');
+            const maskCircles = [];
+            const SVG_NS = "http://www.w3.org/2000/svg";
+            
+            for (let i = 0; i < TRAIL_LENGTH; i++) {
+                const circle = document.createElementNS(SVG_NS, "circle");
+                circle.setAttribute('fill', 'url(#soft-brush)');
+                circle.setAttribute('r', '0');
+                maskGroup.appendChild(circle);
+                maskCircles.push(circle);
             }
-        }, { passive: true });
 
-        let mouseTimeout, idleTimer;
-        const setMouseActiveState = () => {
-            mouseActive = true;
-            clearTimeout(mouseTimeout);
-            mouseTimeout = setTimeout(() => { mouseActive = false; }, 300);
-            clearTimeout(idleTimer);
-            idleTimer = setTimeout(() => { isIdleSwirling = true; idleTime = 0; }, 3000);
-        };
+            const trail = [];
 
-        const updateTarget = (x, y) => {
-            if (isIdleSwirling) {
-                isIdleSwirling = false;
-                currentX = targetX = x;
-                currentY = targetY = y;
-            } else {
+            const setMouseActiveState = () => {
+                mouseActive = true;
+                clearTimeout(mouseTimeout);
+                mouseTimeout = setTimeout(() => { mouseActive = false; }, 300);
+
+                clearTimeout(idleTimer);
+                idleTimer = setTimeout(() => {
+                    isIdleSwirling = true;
+                    idleTime = 0;
+                }, 3000);
+            };
+
+            const updateTarget = (x, y) => {
                 targetX = x;
                 targetY = y;
-            }
-            setMouseActiveState();
-        };
-
-        window.addEventListener("mousemove", (e) => updateTarget(e.clientX, e.clientY));
-        window.addEventListener("touchmove", (e) => updateTarget(e.touches[0].clientX, e.touches[0].clientY), { passive: true });
-
-        window.unlockDesktop = function() {
-            curtain.style.borderRadius = '0px';
-            loginView.style.opacity = '0';
-            loginView.style.transform = 'scale(1.1)';
-            loginView.style.pointerEvents = 'none';
-            document.getElementById('mac-blur').style.opacity = '0';
-            
-            setTimeout(() => {
-                const desktop = document.getElementById('mac-desktop');
-                desktop.style.opacity = '1';
-                desktop.style.pointerEvents = 'auto';
-                desktop.style.transform = 'scale(1)';
-            }, 400);
-        };
-
-        const startTime = Date.now();
-        let appInitialized = false;
-
-        const initApp = () => {
-            if (appInitialized) return;
-            appInitialized = true;
-            
-            const elapsed = Date.now() - startTime;
-            const remaining = Math.max(0, 3200 - elapsed); 
-            
-            setTimeout(() => {
-                const preloader = document.getElementById("preloader");
-                preloader.style.opacity = "0";
-                setTimeout(() => {
-                    preloader.style.display = "none";
-                    isAnimating = true;
-                    scrollIndicator.style.opacity = '1';
-                    idleTimer = setTimeout(() => { isIdleSwirling = true; }, 3000);
-                    animate(); 
-                }, 800); 
-            }, remaining);
-        };
-
-        window.addEventListener("load", initApp);
-        setTimeout(initApp, 5000);
-
-        const emptyMask = "radial-gradient(circle 0px at 50% 50%, transparent 100%)";
-
-        function animate() {
-            if (!isAnimating) return;
-            time += 0.1;
-
-            currentScroll += (targetScroll - currentScroll) * 0.08;
-            const maxScroll = document.body.scrollHeight - window.innerHeight;
-            const progress = maxScroll > 0 ? Math.min(1, Math.max(0, currentScroll / maxScroll)) : 0;
-
-            // Only update marquees if they are actually visible to save massive mobile battery
-            if (progress < 0.9) {
-                let scrollDelta = targetScroll - currentScroll;
-                let autoSpeed = userHasScrolled ? 0 : 0.005;
-                let manualSpeed = userHasScrolled ? (scrollDelta * 0.001) : 0; 
                 
-                marqueeMainOffset -= (autoSpeed + manualSpeed);
-                marqueeSubOffset += (autoSpeed + manualSpeed) * 1.2;
+                if (isIdleSwirling) {
+                    isIdleSwirling = false;
+                    currentX = targetX;
+                    currentY = targetY;
+                }
 
-                if (marqueeMainOffset <= -50) marqueeMainOffset += 50;
-                if (marqueeMainOffset > 0) marqueeMainOffset -= 50;
-                if (marqueeSubOffset >= 0) marqueeSubOffset -= 50;
-                if (marqueeSubOffset < -50) marqueeSubOffset += 50;
+                paraTargetX = (x - centerX) / centerX;
+                paraTargetY = (y - centerY) / centerY;
+                
+                setMouseActiveState();
+            };
 
-                baseMainTrack.style.transform = `translate3d(${marqueeMainOffset}%, -50%, 0)`;
-                revealMainTrack.style.transform = `translate3d(${marqueeMainOffset}%, -50%, 0)`;
-                baseSubTrack.style.transform = `translate3d(${marqueeSubOffset}%, -50%, 0)`;
-                revealSubTrack.style.transform = `translate3d(${marqueeSubOffset}%, -50%, 0)`;
-            }
+            window.addEventListener("mousemove", (e) => updateTarget(e.clientX, e.clientY));
+            window.addEventListener("touchmove", (e) => updateTarget(e.touches[0].clientX, e.touches[0].clientY), { passive: true });
+            window.addEventListener("touchstart", (e) => {
+                updateTarget(e.touches[0].clientX, e.touches[0].clientY);
+                currentX = targetX;
+                currentY = targetY;
+            }, { passive: true });
 
-            let heroScale = 1 - (progress * 0.4);
-            let heroY = progress * 80; 
-            
-            if (progress < 0.9) {
-                subjects.forEach(sub => sub.style.transform = `translate3d(0, ${heroY}%, 0) scale(${heroScale})`);
-            }
+            const lerp = (start, end, factor) => start + (end - start) * factor;
 
-            let curtainY = 100;
-            if (progress > 0.2) curtainY = Math.max(0, 100 - ((progress - 0.2) / 0.5) * 100);
-            curtain.style.transform = `translate3d(0, ${curtainY}%, 0)`;
+            const startTime = Date.now();
+            window.addEventListener("load", () => {
+                const elapsed = Date.now() - startTime;
+                const remaining = Math.max(0, 3200 - elapsed); 
+                
+                setTimeout(() => {
+                    const preloader = document.getElementById("preloader");
+                    preloader.style.opacity = "0";
+                    setTimeout(() => {
+                        preloader.style.display = "none";
+                        isAnimating = true;
+                        
+                        idleTimer = setTimeout(() => {
+                            isIdleSwirling = true;
+                        }, 3000);
 
-            if (curtainY < 5) topNav.classList.add('nav-inverted');
-            else topNav.classList.remove('nav-inverted');
+                        animate(); 
+                    }, 800); 
+                }, remaining);
+            });
 
-            let loginOp = 0;
-            if (progress > 0.6) loginOp = Math.min(1, (progress - 0.6) / 0.3);
-            if (loginView.style.pointerEvents !== 'none') {
-                loginView.style.opacity = loginOp;
-            }
+            function animate() {
+                if (!isAnimating) return;
 
-            // Only calculate heavy mask trail if the Hero section is not completely covered
-            if (progress < 0.6) {
+                frameCount++;
+                time += 0.1;
+
                 if (isIdleSwirling) {
                     idleTime += 0.025; 
                     targetX = centerX + Math.sin(idleTime * 1.3) * (centerX * 0.6) + Math.sin(idleTime * 2.8) * (centerX * 0.2);
                     targetY = centerY + Math.cos(idleTime * 0.9) * (centerY * 0.6) + Math.sin(idleTime * 2.1) * (centerY * 0.2);
-                    maskFadeMultiplier += (1 - maskFadeMultiplier) * 0.05;
+
+                    paraTargetX = ((targetX - centerX) / centerX) * 0.4;
+                    paraTargetY = ((targetY - centerY) / centerY) * 0.4;
+                    maskFadeMultiplier = lerp(maskFadeMultiplier, 1, 0.05);
                 } else {
-                    maskFadeMultiplier += ((mouseActive ? 1 : 0) - maskFadeMultiplier) * 0.1;
+                    maskFadeMultiplier = lerp(maskFadeMultiplier, mouseActive ? 1 : 0, mouseActive ? 0.1 : 0.08);
                 }
 
                 let dx = targetX - currentX;
                 let dy = targetY - currentY;
-                let dist = Math.sqrt(dx*dx + dy*dy);
-                
-                if (dist > 0) {
-                    let activeDist = dist > 30 ? 30 + Math.sqrt(dist - 30) * 8 : dist;
-                    currentX += (dx / dist) * activeDist * LAG_FACTOR;
-                    currentY += (dy / dist) * activeDist * LAG_FACTOR;
+                let distance = Math.sqrt(dx*dx + dy*dy);
+                let velocity = distance;
+
+                if (distance > 0) {
+                    let activeDist = distance;
+                    if (distance > 30) {
+                        activeDist = 30 + Math.sqrt(distance - 30) * 8; 
+                    }
+                    currentX += (dx / distance) * activeDist * LAG_FACTOR;
+                    currentY += (dy / distance) * activeDist * LAG_FACTOR;
                 }
 
-                trail.unshift({ x: currentX, y: currentY, vel: dist });
-                if (trail.length > TRAIL_LENGTH) trail.pop();
+                trail.unshift({ x: currentX, y: currentY, vel: velocity });
+                if (trail.length > TRAIL_LENGTH) {
+                    trail.pop();
+                }
 
+                // Batch SVG DOM Updates
                 let len = trail.length;
                 let dynamicRadius = MAIN_RADIUS * Math.pow(maskFadeMultiplier, 0.5);
                 
-                // Use array join instead of string concatenation for faster parsing
-                let maskParts = [];
-                
-                for (let i = 0; i < len; i++) {
-                    let p = trail[i];
-                    let prog = i / TRAIL_LENGTH;
-                    let opacity = (Math.max(0, 1 - Math.pow(prog, 1.2)) * maskFadeMultiplier);
+                for (let i = 0; i < TRAIL_LENGTH; i++) {
+                    const circle = maskCircles[i];
                     
-                    if (opacity < 0.05) continue; 
-                    
-                    let opacityStr = opacity.toFixed(2);
-                    let halfOpacityStr = (opacity * 0.5).toFixed(2);
-                    
-                    let baseSize = dynamicRadius + (Math.min(p.vel * 0.8, 30));
-                    let ripple = Math.sin(i * 0.4 - time * 2) * (15 * (1 - prog));
-                    // Math.round strips decimals, drastically speeding up browser CSS parsing
-                    let size = Math.round(Math.max(0, (baseSize * (1 - prog * 0.5)) + ripple));
-                    
-                    let wobbleX = Math.cos(i * 0.25 + time * 1.2) * (20 * prog);
-                    let wobbleY = Math.sin(i * 0.3 - time * 1.5) * (20 * prog);
-                    
-                    let finalX = Math.round(p.x + wobbleX);
-                    let finalY = Math.round(p.y + wobbleY);
+                    if (i < len && maskFadeMultiplier > 0.01) {
+                        let point = trail[i];
+                        let progress = i / TRAIL_LENGTH;
+                        let rawOpacity = Math.max(0, 1 - Math.pow(progress, 1.2));
+                        let opacity = (rawOpacity * maskFadeMultiplier).toFixed(2);
+                        
+                        if (opacity < 0.02) {
+                            circle.setAttribute('r', '0');
+                            continue;
+                        }
+                        
+                        let baseSize = dynamicRadius + (Math.min(point.vel * 0.8, 30));
+                        let ripple = Math.sin(i * 0.4 - time * 2) * (15 * (1 - progress));
+                        let size = Math.max(0, (baseSize * (1 - progress * 0.5)) + ripple).toFixed(1);
+                        
+                        let wobbleX = Math.cos(i * 0.25 + time * 1.2) * (20 * progress);
+                        let wobbleY = Math.sin(i * 0.3 - time * 1.5) * (20 * progress);
+                        
+                        let finalX = (point.x + wobbleX).toFixed(1);
+                        let finalY = (point.y + wobbleY).toFixed(1);
 
-                    maskParts.push(`radial-gradient(circle ${size}px at ${finalX}px ${finalY}px, rgba(0,0,0,${opacityStr}) 15%, rgba(0,0,0,${halfOpacityStr}) 45%, transparent 80%)`);
+                        circle.setAttribute('cx', finalX);
+                        circle.setAttribute('cy', finalY);
+                        circle.setAttribute('r', size);
+                        circle.setAttribute('opacity', opacity);
+                    } else {
+                        circle.setAttribute('r', '0');
+                    }
                 }
 
-                if (maskParts.length === 0) {
-                    revealLayer.style.webkitMaskImage = emptyMask;
-                    revealLayer.style.maskImage = emptyMask;
-                } else {
-                    let maskString = maskParts.join(",");
-                    revealLayer.style.webkitMaskImage = maskString;
-                    revealLayer.style.maskImage = maskString;
-                }
-            } else {
-                revealLayer.style.webkitMaskImage = emptyMask;
-                revealLayer.style.maskImage = emptyMask;
+                // Smooth Parallax Updates
+                paraCurrentX = lerp(paraCurrentX, paraTargetX, 0.05);
+                paraCurrentY = lerp(paraCurrentY, paraTargetY, 0.05);
+
+                let transX_bg = (paraCurrentX * -20).toFixed(1);
+                let transY_bg = (paraCurrentY * -20).toFixed(1);
+                let transX_sub = (paraCurrentX * 15).toFixed(1);
+                let transY_sub = (paraCurrentY * 15).toFixed(1);
+                let transX_text = (paraCurrentX * 30).toFixed(1);
+                let transY_text = (paraCurrentY * 30).toFixed(1);
+
+                bgs.forEach(bg => bg.style.transform = `translate3d(${transX_bg}px, ${transY_bg}px, 0)`);
+                subjects.forEach(sub => sub.style.transform = `translate3d(${transX_sub}px, ${transY_sub}px, 0)`);
+                scrollWrappers.forEach(sw => sw.style.transform = `translate3d(${transX_text}px, ${transY_text}px, 0)`);
+
+                requestAnimationFrame(animate);
             }
 
-            requestAnimationFrame(animate);
-        }
+            // --- macOS Dock Javascript ---
+            const icons = document.querySelectorAll(".ico");
+
+            const resetIcons = () => {
+                icons.forEach((item) => {
+                    item.style.transform = "scale(1) translateY(0px)";
+                });
+            };
+
+            icons.forEach((item, index) => {
+                item.addEventListener("mouseover", () => focusIcon(index));
+                item.addEventListener("mouseleave", resetIcons);
+            });
+
+            const focusIcon = (index) => {
+                resetIcons();
+                const transformations = [
+                    { idx: index - 2, scale: 1.1, translateY: 0 },
+                    { idx: index - 1, scale: 1.2, translateY: -6 },
+                    { idx: index, scale: 1.5, translateY: -10 },
+                    { idx: index + 1, scale: 1.2, translateY: -6 },
+                    { idx: index + 2, scale: 1.1, translateY: 0 }
+                ];
+
+                transformations.forEach(({ idx, scale, translateY }) => {
+                    if (icons[idx]) {
+                        icons[idx].style.transform = `scale(${scale}) translateY(${translateY}px)`;
+                    }
+                });
+            };
+        });
     </script>
 </body>
 </html>
