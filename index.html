@@ -20,7 +20,6 @@
     <style>
         /* === CSS Custom Properties === */
         :root {
-            /* Colors */
             --bg-base-light: #ebebeb;
             --bg-base-dark: #000;
             
@@ -33,24 +32,18 @@
             --text-sub-light-alt: #bbb;
             --text-sub-dark-alt: #222;
 
-            /* Dimensions & Timing */
             --pad: 40px;
             --icon-size: 24px;
             --transition: 0.6s ease-in-out;
             --font-serif: 'Instrument Serif', serif;
             --font-display: 'Plaster', serif;
+            --font-apple: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Helvetica, Arial, sans-serif;
         }
 
-        /* === Reset & Base Styles === */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body, html {
-            width: 100vw;
-            height: 100vh;
+            width: 100vw; height: 100vh;
             overflow: hidden;
             background-color: var(--bg-base-light); 
             font-family: var(--font-serif);
@@ -59,343 +52,265 @@
             transition: background-color var(--transition);
         }
 
-        body.dark-mode {
-            background-color: var(--bg-base-dark);
-        }
+        body.dark-mode { background-color: var(--bg-base-dark); }
 
         /* === Preloader === */
         #preloader {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background-color: var(--bg-base-dark);
-            z-index: 9999;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: opacity 0.8s ease-in-out;
-            pointer-events: none;
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: var(--bg-base-dark); z-index: 9999;
+            display: flex; justify-content: center; align-items: center;
+            transition: opacity 0.8s ease-in-out; pointer-events: none;
         }
-
-        #preloader img {
-            width: 200px;
-            height: 200px;
-            object-fit: contain;
-        }
-
-        @media (max-width: 768px) {
-            #preloader img {
-                width: 120px;
-                height: 120px;
-            }
-        }
+        #preloader img { width: 200px; height: 200px; object-fit: contain; }
+        @media (max-width: 768px) { #preloader img { width: 120px; height: 120px; } }
 
         /* === Core Architecture === */
-        .reveal-container {
-            position: relative;
-            width: 100vw;
-            height: 100vh;
-        }
-
-        .layer {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            pointer-events: none;
-        }
-
-        /* Hardware Accelerated Layering */
+        .reveal-container { position: relative; width: 100vw; height: 100vh; }
+        .layer { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; }
         .base-layer { z-index: 1; }
-        
-        .reveal-layer {
-            z-index: 2;
-            transform: translateZ(0); /* Force GPU compositing layer */
-        }
+        .reveal-layer { z-index: 2; transform: translateZ(0); }
 
-        /* === Backgrounds === */
+        /* === Backgrounds & Subjects === */
         .layer-img {
-            position: absolute;
-            top: -5%;
-            left: -5%;
-            width: 110%;
-            height: 110%;
-            object-fit: cover;
-            object-position: center;
-            transform-origin: center;
-            will-change: transform;
-            transition: filter var(--transition);
+            position: absolute; top: -5%; left: -5%; width: 110%; height: 110%;
+            object-fit: cover; object-position: center; transform-origin: center;
+            will-change: transform; transition: filter var(--transition);
         }
-
-        .reveal-layer .bg {
-            filter: brightness(0.4) contrast(1.3);
-        }
-
+        .reveal-layer .bg { filter: brightness(0.4) contrast(1.3); }
         body.dark-mode .base-layer .bg { filter: brightness(0.25) contrast(1.2); }
         body.dark-mode .reveal-layer .bg { filter: none; }
 
-        /* === Subjects === */
         .subject-wrapper {
-            position: absolute;
-            top: -5%;
-            left: -5%;
-            width: 110%;
-            height: 110%;
-            display: flex;
-            justify-content: center;
-            align-items: flex-end;
-            will-change: transform;
-            z-index: 2;
+            position: absolute; top: -5%; left: -5%; width: 110%; height: 110%;
+            display: flex; justify-content: center; align-items: flex-end;
+            will-change: transform; z-index: 2;
         }
-
         .subject-img {
-            height: 90%;
-            width: auto;
-            object-fit: contain;
-            transform-origin: bottom center;
-            position: absolute;
-            transition: opacity var(--transition);
+            height: 90%; width: auto; object-fit: contain;
+            transform-origin: bottom center; position: absolute; transition: opacity var(--transition);
         }
-
-        .img-light { opacity: 1; }
-        .img-dark { opacity: 0; }
-        body.dark-mode .img-light { opacity: 0; }
-        body.dark-mode .img-dark { opacity: 1; }
-
-        .reveal-layer .img-light { opacity: 0; }
-        .reveal-layer .img-dark { opacity: 1; }
-        body.dark-mode .reveal-layer .img-light { opacity: 1; }
-        body.dark-mode .reveal-layer .img-dark { opacity: 0; }
+        .img-light { opacity: 1; } .img-dark { opacity: 0; }
+        body.dark-mode .img-light { opacity: 0; } body.dark-mode .img-dark { opacity: 1; }
+        .reveal-layer .img-light { opacity: 0; } .reveal-layer .img-dark { opacity: 1; }
+        body.dark-mode .reveal-layer .img-light { opacity: 1; } body.dark-mode .reveal-layer .img-dark { opacity: 0; }
 
         /* === Marquee Text === */
-        .scroll-text-wrapper {
-            position: absolute;
-            left: 0;
-            width: 100%;
-            overflow: hidden;
-            pointer-events: none;
-            z-index: 1;
-            will-change: transform;
-        }
+        .scroll-text-wrapper { position: absolute; left: 0; width: 100%; overflow: hidden; pointer-events: none; z-index: 1; will-change: transform; }
+        .main-track-wrapper { top: 48%; height: 5.2rem; }
+        .sub-track-wrapper { top: 38%; height: 4.8rem; }
+        .scroll-text-track { position: absolute; top: 50%; left: 0; display: inline-flex; white-space: nowrap; font-family: var(--font-display); font-weight: 700; text-transform: uppercase; transform: translate3d(-50%, -50%, 0); will-change: transform; }
+        .scroll-text-item { display: inline-block; }
+        .scroll-text-track.main { font-size: 7rem; letter-spacing: 0.1em; animation: scrollRight 100s linear infinite; }
+        .scroll-text-track.sub { font-size: 5.5rem; letter-spacing: 0.15em; animation: scrollLeft 140s linear infinite; }
 
-        .main-track-wrapper {
-            top: 48%;
-            height: 5.2rem;
-        }
-
-        .sub-track-wrapper {
-            top: 38%;
-            height: 4.8rem;
-        }
-
-        .scroll-text-track {
-            position: absolute;
-            top: 50%;
-            left: 0;
-            display: inline-flex;
-            white-space: nowrap;
-            font-family: var(--font-display);
-            font-weight: 700;
-            text-transform: uppercase;
-            transform: translate3d(-50%, -50%, 0);
-            will-change: transform;
-        }
-
-        .scroll-text-item {
-            display: inline-block;
-        }
-
-        /* Typography Tracking */
-        .scroll-text-track.main {
-            font-size: 7rem;
-            letter-spacing: 0.1em;
-            animation: scrollRight 100s linear infinite;
-        }
-
-        .scroll-text-track.sub {
-            font-size: 5.5rem; 
-            letter-spacing: 0.15em; 
-            animation: scrollLeft 140s linear infinite;
-        }
-
-        /* Dynamic Colors for Base/Reveal Tracks */
         .text-main-base { color: var(--text-main-light); }
         .text-main-reveal { color: var(--text-main-dark); }
         body.dark-mode .text-main-base { color: var(--text-main-dark); }
         body.dark-mode .text-main-reveal { color: var(--text-main-light); }
-        
         .text-sub-base { color: var(--text-sub-light); }
         .text-sub-reveal { color: var(--text-sub-dark); }
         body.dark-mode .text-sub-base { color: var(--text-sub-light-alt); }
         body.dark-mode .text-sub-reveal { color: var(--text-sub-dark-alt); }
 
-        @keyframes scrollRight {
-            0% { transform: translate3d(-50%, -50%, 0); }
-            100% { transform: translate3d(0, -50%, 0); }
-        }
-
-        @keyframes scrollLeft {
-            0% { transform: translate3d(0, -50%, 0); }
-            100% { transform: translate3d(-50%, -50%, 0); }
-        }
+        @keyframes scrollRight { 0% { transform: translate3d(-50%, -50%, 0); } 100% { transform: translate3d(0, -50%, 0); } }
+        @keyframes scrollLeft { 0% { transform: translate3d(0, -50%, 0); } 100% { transform: translate3d(-50%, -50%, 0); } }
 
         /* === Navigation & UI === */
-        .nav-container {
-            position: absolute;
-            top: var(--pad);
-            left: var(--pad);
-            right: var(--pad);
-            display: flex;
-            justify-content: space-between;
-            font-size: 14px;
-            font-weight: 600;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            pointer-events: none;
-            z-index: 200;
-        }
-
+        .nav-container { position: absolute; top: var(--pad); left: var(--pad); right: var(--pad); display: flex; justify-content: space-between; font-size: 14px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; pointer-events: none; z-index: 200; }
         .nav-base { color: var(--text-main-light); z-index: 3; }
         .nav-reveal { color: var(--text-main-dark); z-index: 1; }
         body.dark-mode .nav-base { color: var(--text-main-dark); }
         body.dark-mode .nav-reveal { color: var(--text-main-light); }
-
         nav > div { pointer-events: auto; }
 
         /* === Theme Toggle Icons === */
-        #dark-mode-toggle {
-            cursor: pointer;
-            pointer-events: auto;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: var(--icon-size);
-            height: var(--icon-size);
-        }
-
-        .toggle-icon {
-            position: relative;
-            width: var(--icon-size);
-            height: var(--icon-size);
-        }
-
-        .toggle-icon svg {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: var(--icon-size);
-            height: var(--icon-size);
-            stroke: currentColor;
-            transition: all 0.5s ease;
-        }
-
+        #dark-mode-toggle { cursor: pointer; pointer-events: auto; display: flex; align-items: center; justify-content: center; width: var(--icon-size); height: var(--icon-size); }
+        .toggle-icon { position: relative; width: var(--icon-size); height: var(--icon-size); }
+        .toggle-icon svg { position: absolute; top: 0; left: 0; width: var(--icon-size); height: var(--icon-size); stroke: currentColor; transition: all 0.5s ease; }
         .icon-moon { opacity: 1; transform: rotate(0) scale(1); }
         .icon-sun { opacity: 0; transform: rotate(-90deg) scale(0.5); }
         body.dark-mode .icon-moon { opacity: 0; transform: rotate(90deg) scale(0.5); }
         body.dark-mode .icon-sun { opacity: 1; transform: rotate(0) scale(1); }
 
         /* === macOS Dock === */
-        .dock {
-            width: auto;
-            height: 60px;
-            border-radius: 16px;
-            display: flex;
-            justify-content: center;
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 1000;
-            pointer-events: auto; /* Ensure it's clickable above the mask */
-        }
+        .dock { width: auto; height: 60px; border-radius: 16px; display: flex; justify-content: center; position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 1000; pointer-events: auto; }
+        .dock-container { padding: 3px 10px; width: auto; height: 100%; display: flex; align-items: center; justify-content: center; border-radius: 16px; background: rgba(83, 83, 83, 0.25); backdrop-filter: blur(13px); -webkit-backdrop-filter: blur(13px); border: 1px solid rgba(255, 255, 255, 0.18); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .dock-container li { list-style: none; display: flex; align-items: center; justify-content: center; width: 50px; height: 50px; vertical-align: bottom; transition: 0.2s; transform-origin: 50% 100%; position: relative; cursor: pointer; }
+        .dock-container li:hover { margin: 0px 13px 0px 13px; }
+        .dock-container li .name { position: absolute; top: -55px; background: rgba(0, 0, 0, 0.5); color: rgba(255, 255, 255, 0.9); height: auto; padding: 6px 12px; display: flex; align-items: center; justify-content: center; border-radius: 5px; visibility: hidden; font-family: var(--font-apple); font-size: 13px; font-weight: 500; letter-spacing: 0.5px; white-space: nowrap; }
+        .dock-container li .name::after { content: ""; position: absolute; bottom: -8px; width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent; border-top: 8px solid rgba(0, 0, 0, 0.5); }
+        .dock-container li:hover .name { visibility: visible; }
+        .dock-container li .ico { width: 100%; height: 100%; object-fit: cover; display: inline-block; transition: transform 0.3s ease; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3)); }
+        
+        .dock-container .li-active::after { position: absolute; width: 4px; height: 4px; border-radius: 50%; background: rgba(255, 255, 255, 0.8); content: ""; bottom: -2px; }
 
-        .dock-container {
-            padding: 3px 10px;
-            width: auto;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 16px;
-            background: rgba(83, 83, 83, 0.25);
-            backdrop-filter: blur(13px);
-            -webkit-backdrop-filter: blur(13px);
-            border: 1px solid rgba(255, 255, 255, 0.18);
-        }
-
-        .dock-container li {
-            list-style: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 50px;
-            height: 50px;
-            vertical-align: bottom;
-            transition: 0.2s;
-            transform-origin: 50% 100%;
-            position: relative;
-            cursor: pointer;
-        }
-
-        .dock-container li:hover {
-            margin: 0px 13px 0px 13px;
-        }
-
-        .dock-container li .name {
-            position: absolute;
-            top: -55px;
-            background: rgba(0, 0, 0, 0.5);
-            color: rgba(255, 255, 255, 0.9);
-            height: auto;
-            padding: 6px 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 5px;
-            visibility: hidden;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            font-size: 13px;
-            font-weight: 500;
-            letter-spacing: 0.5px;
-            white-space: nowrap;
-        }
-
-        .dock-container li .name::after {
-            content: "";
-            position: absolute;
-            bottom: -8px;
-            width: 0;
-            height: 0;
-            border-left: 8px solid transparent;
-            border-right: 8px solid transparent;
-            border-top: 8px solid rgba(0, 0, 0, 0.5);
-        }
-
-        .dock-container li:hover .name {
-            visibility: visible;
-        }
-
-        .dock-container li .ico {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: inline-block;
-            transition: transform 0.3s ease;
+        /* === macOS Application Window (Liquid Glass Portfolio App) === */
+        .mac-window {
+            position: fixed;
+            background: rgba(250, 250, 250, 0.85);
+            backdrop-filter: blur(30px) saturate(150%);
+            -webkit-backdrop-filter: blur(30px) saturate(150%);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 14px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255,255,255,0.3) inset;
+            overflow: hidden; display: none; flex-direction: column;
+            pointer-events: none; z-index: 900;
+            font-family: var(--font-apple);
         }
         
-        /* Optional indicator dot for Finder */
-        .dock-container .li-finder::after {
-            position: absolute;
-            width: 4px;
-            height: 4px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.5);
-            content: "";
-            bottom: 0px;
+        body.dark-mode .mac-window {
+            background: rgba(30, 30, 30, 0.75);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255,255,255,0.05) inset;
         }
+
+        .mac-window.open { display: flex; pointer-events: auto; }
+
+        /* Title Bar */
+        .title-bar {
+            height: 52px; display: flex; align-items: center; padding: 0 16px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1); cursor: grab;
+            background: rgba(255, 255, 255, 0.2);
+            position: relative;
+        }
+        .title-bar:active { cursor: grabbing; }
+        body.dark-mode .title-bar { border-bottom: 1px solid rgba(255, 255, 255, 0.1); background: rgba(0, 0, 0, 0.2); }
+
+        /* Dynamic Expandable Traffic Lights Style */
+        .traffic-lights { 
+            display: flex; 
+            gap: 8px; 
+            align-items: center;
+            z-index: 10;
+        }
+        .traffic-light { 
+            width: 12px; 
+            height: 12px; 
+            border-radius: 50%; 
+            cursor: pointer; 
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(0,0,0,0.08); 
+            transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .traffic-light::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        .close { background: #ff5f57; } 
+        .minimize { background: #ffbd2e; } 
+        .maximize { background: #28ca42; }
+
+        /* Hover Interaction Effects */
+        .traffic-light:hover {
+            transform: scale(1.3);
+        }
+
+        .window-title { position: absolute; left: 50%; transform: translateX(-50%); font-size: 13px; font-weight: 600; color: #1d1d1f; }
+        body.dark-mode .window-title { color: #f5f5f7; }
+
+        /* App Content Area */
+        .content-area { flex: 1; display: flex; overflow: hidden; }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px; display: flex; flex-direction: column;
+            background: rgba(0, 0, 0, 0.03); border-right: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        body.dark-mode .sidebar { background: rgba(255, 255, 255, 0.02); border-right: 1px solid rgba(255, 255, 255, 0.1); }
+        
+        .notes-list { flex: 1; overflow-y: auto; padding: 10px; }
+        .notes-list::-webkit-scrollbar { display: none; }
+
+        .note-item {
+            padding: 12px 16px; margin-bottom: 5px; border-radius: 8px;
+            cursor: pointer; transition: all 0.2s ease;
+        }
+        .note-item:hover { background: rgba(0, 0, 0, 0.05); }
+        body.dark-mode .note-item:hover { background: rgba(255, 255, 255, 0.05); }
+        
+        .note-item.active { background: #ffca22; color: #000; box-shadow: 0 2px 5px rgba(255, 202, 34, 0.4); }
+        
+        .note-title { font-size: 14px; font-weight: 700; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #1d1d1f; }
+        body.dark-mode .note-title { color: #fff; }
+        .note-item.active .note-title { color: #000; }
+
+        .note-preview { font-size: 12px; color: #8e8e93; line-height: 1.3; height: 32px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+        .note-item.active .note-preview { color: rgba(0, 0, 0, 0.7); }
+        
+        .note-date { font-size: 11px; color: #8e8e93; margin-top: 6px; font-weight: 500;}
+        .note-item.active .note-date { color: rgba(0, 0, 0, 0.6); }
+
+        /* Main View */
+        .note-view { flex: 1; display: flex; flex-direction: column; background: transparent; padding: 30px 40px; overflow-y: auto; }
+        .note-view::-webkit-scrollbar { width: 6px; }
+        .note-view::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.2); border-radius: 10px; }
+        body.dark-mode .note-view::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); }
+
+        .note-view-title { font-size: 28px; font-weight: 800; color: #1d1d1f; margin-bottom: 5px; letter-spacing: -0.5px; }
+        body.dark-mode .note-view-title { color: #f5f5f7; }
+        
+        .note-view-meta { font-size: 13px; color: #8e8e93; margin-bottom: 30px; font-weight: 500; }
+        
+        .note-view-content { font-size: 15px; line-height: 1.6; color: #333; }
+        body.dark-mode .note-view-content { color: #ddd; }
+        
+        .note-view-content p { margin-bottom: 16px; }
+        .note-view-content strong { font-weight: 600; color: #000; }
+        body.dark-mode .note-view-content strong { color: #fff; }
+        
+        /* === Perfect Fluid Screen Sizing & Layout Constraints (Mobile Optimization Rework) === */
+        @media (max-width: 768px) {
+            .content-area {
+                flex-direction: column;
+            }
+            .sidebar { 
+                width: 100% !important; 
+                height: 160px !important; 
+                border-right: none !important; 
+                border-bottom: 1px solid rgba(0,0,0,0.1) !important; 
+            }
+            body.dark-mode .sidebar { 
+                border-bottom: 1px solid rgba(255,255,255,0.1) !important; 
+            }
+            .notes-list { 
+                display: flex !important; 
+                flex-direction: row !important; 
+                gap: 12px !important; 
+                overflow-x: auto !important; 
+                overflow-y: hidden !important; 
+                padding: 12px !important; 
+                align-items: center;
+            }
+            .note-item { 
+                min-width: 170px !important; 
+                height: 110px !important;
+                margin-bottom: 0 !important; 
+                flex-shrink: 0 !important;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+            }
+            .note-preview {
+                height: 16px !important;
+                -webkit-line-clamp: 1 !important;
+            }
+            .note-view { 
+                height: calc(100% - 160px) !important; 
+                padding: 24px 20px !important; 
+            }
+            .note-view-title { font-size: 22px !important; }
+        }
+
     </style>
     
     <script type="application/ld+json">
@@ -422,11 +337,9 @@
 
     <div class="reveal-container">
         
-        <!-- ==========================================
-             BASE LAYER (Default Visiblity & SEO)
-        =========================================== -->
+        <!-- BASE LAYER -->
         <div class="layer base-layer">
-            <img src="IMG_0337.PNG" alt="Background image of Max Tianyu Wang's photography portfolio" class="layer-img bg">
+            <img src="IMG_0337.PNG" alt="Background" class="layer-img bg">
             
             <div class="nav-container nav-base">
                 <div>Max Tianyu Wang</div>
@@ -453,14 +366,12 @@
             </div>
 
             <div class="subject-wrapper subject">
-                <img src="IMG_0336.PNG" alt="Portrait of Max Tianyu Wang in light mode" class="subject-img img-light">
-                <img src="IMG_0335.PNG" alt="Artistic illustration of Max Tianyu Wang in dark mode" class="subject-img img-dark">
+                <img src="IMG_0336.PNG" alt="Max Tianyu Wang Light" class="subject-img img-light">
+                <img src="IMG_0335.PNG" alt="Max Tianyu Wang Dark" class="subject-img img-dark">
             </div>
         </div>
 
-        <!-- ==========================================
-             REVEAL LAYER (SVG with ForeignObject Mask)
-        =========================================== -->
+        <!-- REVEAL LAYER -->
         <svg class="layer reveal-layer" id="revealLayer" aria-hidden="true" width="100%" height="100%" preserveAspectRatio="none">
             <defs>
                 <radialGradient id="soft-brush">
@@ -468,16 +379,13 @@
                     <stop offset="45%" stop-color="white" stop-opacity="0.5" />
                     <stop offset="80%" stop-color="white" stop-opacity="0" />
                 </radialGradient>
-                
                 <mask id="cursor-mask" maskUnits="userSpaceOnUse" x="-50%" y="-50%" width="200%" height="200%">
                     <rect width="100%" height="100%" fill="black" />
-                    <!-- Circles injected dynamically via JS -->
                     <g id="mask-elements"></g>
                 </mask>
             </defs>
 
             <foreignObject width="100%" height="100%" mask="url(#cursor-mask)">
-                <!-- Strict XML requires xmlns and strictly self-closed elements like <img/> and &#160; -->
                 <div xmlns="http://www.w3.org/1999/xhtml" style="width: 100vw; height: 100vh; position: absolute; top: 0; left: 0;">
                     <img src="IMG_0337.PNG" class="layer-img bg" alt="" />
                     
@@ -518,30 +426,271 @@
     <!-- === MACOS DOCK === -->
     <div class="dock">
         <ul class="dock-container">
-            <li class="li-finder">
+            <li onclick="openApp(event, 'About')" class="app-icon">
                 <div class="name">About</div>
-                <img class="ico" src="https://uploads-ssl.webflow.com/5f7081c044fb7b3321ac260e/5f70853981255cc36b3a37af_finder.png" alt="Finder">
+                <img class="ico" src="https://uploads-ssl.webflow.com/5f7081c044fb7b3321ac260e/5f70853981255cc36b3a37af_finder.png" alt="About">
             </li>
-            <li>
+            <li onclick="openApp(event, 'Photos')" class="app-icon">
                 <div class="name">Photos</div>
                 <img class="ico" src="https://uploads-ssl.webflow.com/5f7081c044fb7b3321ac260e/5f70853c55558a2e1192ee09_photos.png" alt="Photos">
             </li>
-            <li>
+            <li onclick="openApp(event, 'Portfolio')" class="app-icon li-active" id="dock-notes">
                 <div class="name">Portfolio</div>
-                <img class="ico" src="https://uploads-ssl.webflow.com/5f7081c044fb7b3321ac260e/5f70853c849ec3735b52cef9_notes.png" alt="Notes">
+                <img class="ico" src="https://uploads-ssl.webflow.com/5f7081c044fb7b3321ac260e/5f70853c849ec3735b52cef9_notes.png" alt="Portfolio">
             </li>
-            <li>
+            <li onclick="openApp(event, 'Creations')" class="app-icon">
                 <div class="name">Creations</div>
-                <img class="ico" src="https://uploads-ssl.webflow.com/5f7081c044fb7b3321ac260e/5f70853270b5e2ccfd795b49_appstore.png" alt="App Store">
+                <img class="ico" src="https://uploads-ssl.webflow.com/5f7081c044fb7b3321ac260e/5f70853270b5e2ccfd795b49_appstore.png" alt="Creations">
             </li>
-            <li>
+            <li onclick="openApp(event, 'Socials')" class="app-icon">
                 <div class="name">Socials</div>
-                <img class="ico" src="https://uploads-ssl.webflow.com/5f7081c044fb7b3321ac260e/5f70853743597518c528b9b3_contacts.png" alt="Contacts">
+                <img class="ico" src="https://uploads-ssl.webflow.com/5f7081c044fb7b3321ac260e/5f70853743597518c528b9b3_contacts.png" alt="Socials">
             </li>
         </ul>
     </div>
 
+    <!-- === MACOS APP WINDOW === -->
+    <div id="mac-window" class="mac-window">
+        <div class="title-bar" id="window-drag-handle">
+            <div class="traffic-lights">
+                <div class="traffic-light close" onclick="closeApp(event)" title="Close"></div>
+                <div class="traffic-light minimize" onclick="closeApp(event)" title="Minimize"></div>
+                <div class="traffic-light maximize" onclick="toggleMaximize(event)" title="Full Screen"></div>
+            </div>
+            <div class="window-title" id="window-title">Portfolio</div>
+        </div>
+
+        <div class="content-area">
+            <div class="sidebar">
+                <div class="notes-list" id="notesList">
+                    <!-- Dynamic Notes Loaded Here -->
+                </div>
+            </div>
+
+            <div class="note-view">
+                <div class="note-view-title" id="noteTitle">Select a note</div>
+                <div class="note-view-meta" id="noteMeta"></div>
+                <div class="note-view-content" id="noteContent"></div>
+            </div>
+        </div>
+    </div>
+
     <script>
+        // === App Data & Logic ===
+        const portfolioNotes = [
+            {
+                id: 1, title: "About Me", date: "Today at 9:41 AM",
+                preview: "Hello! I am Max Tianyu Wang, a student and creator...",
+                content: "<p>Hello! I am <strong>Max Tianyu Wang</strong>, a student at Collège Villa Maria in Montreal, Class of 2026.</p><p>I am passionate about blending art with technology. As the Co-Prime Minister of the Student Council, I love organizing events and leading my peers. Beyond school, I am a certified Level 1 ski instructor and an avid participant in robotics and academic decathlons.</p>"
+            },
+            {
+                id: 2, title: "Photography & Video", date: "Yesterday",
+                preview: "A collection of my work behind the lens...",
+                content: "<p>Photography is how I capture the world. Using Sony mirrorless systems (NEX-F3, a6600), I focus on precise composition and lighting.</p><p>Beyond still images, I delve into videography, filmmaking, and rendering 3D models in Blender to bring robotic concepts to life before they are even built.</p>"
+            },
+            {
+                id: 3, title: "Robotics Engineering", date: "May 24, 2026",
+                preview: "Lead CAD designer for FIRST Tech Challenge...",
+                content: "<p>I serve as the lead CAD designer (using Onshape) and mechanical engineer for FTC teams Villaciraptors and Fossilized Functions.</p><p>My specialty lies in high-level 3D printing with PETG/PLA and designing custom PIDF control loops for complex robot components like hooded shooters and custom chassis.</p>"
+            },
+            {
+                id: 4, title: "Web & Coding", date: "May 15, 2026",
+                preview: "Interactive web experiences using GSAP and JS...",
+                content: "<p>I build interactive, highly-polished web experiences. My toolset includes HTML, CSS, JavaScript, and complex animation libraries like GSAP.</p><p>This portfolio itself is an exploration of masking, parallax, and custom cursor trails built from scratch!</p>"
+            }
+        ];
+
+        let currentNoteId = 1;
+
+        function renderNotes() {
+            const list = document.getElementById("notesList");
+            list.innerHTML = "";
+            portfolioNotes.forEach(note => {
+                const el = document.createElement("div");
+                el.className = `note-item ${note.id === currentNoteId ? "active" : ""}`;
+                el.onclick = () => selectNote(note.id);
+                el.innerHTML = `
+                    <div class="note-title">${note.title}</div>
+                    <div class="note-preview">${note.preview}</div>
+                    <div class="note-date">${note.date}</div>
+                `;
+                list.appendChild(el);
+            });
+        }
+
+        function selectNote(id) {
+            currentNoteId = id;
+            const note = portfolioNotes.find(n => n.id === id);
+            if (note) {
+                document.getElementById("noteTitle").textContent = note.title;
+                document.getElementById("noteMeta").textContent = note.date;
+                document.getElementById("noteContent").innerHTML = note.content;
+            }
+            renderNotes();
+        }
+
+        renderNotes();
+        selectNote(1);
+
+        // === Window Animation & Drag Logic ===
+        let lastOriginRect = null;
+        let isMaximized = false;
+        let preMaxState = { top: 0, left: 0, width: 0, height: 0 };
+        const win = document.getElementById('mac-window');
+        
+        win.style.transition = 'all 0.5s cubic-bezier(0.25, 1, 0.5, 1)';
+
+        window.openApp = function(event, appName) {
+            event.stopPropagation();
+            
+            if (appName === 'Socials') {
+                window.open('https://instagram.com/mtyw.ca', '_blank');
+                return;
+            }
+            
+            if (appName !== 'Portfolio') {
+                return;
+            }
+            
+            const icon = event.currentTarget;
+            lastOriginRect = icon.getBoundingClientRect();
+            
+            document.getElementById('window-title').innerText = appName;
+            
+            win.style.transition = 'none';
+            win.style.top = `${lastOriginRect.top}px`;
+            win.style.left = `${lastOriginRect.left}px`;
+            win.style.width = `${lastOriginRect.width}px`;
+            win.style.height = `${lastOriginRect.height}px`;
+            win.style.transform = `scale(0.5)`;
+            win.style.opacity = '0';
+            win.classList.add('open');
+            
+            void win.offsetWidth;
+            
+            win.style.transition = 'all 0.5s cubic-bezier(0.25, 1, 0.5, 1)';
+            win.style.opacity = '1';
+            
+            let targetWidth = window.innerWidth * 0.6;
+            let targetHeight = window.innerHeight * 0.6;
+            if(window.innerWidth < 768) {
+                 targetWidth = window.innerWidth * 0.9;
+                 targetHeight = window.innerHeight * 0.8;
+            }
+            
+            win.style.width = `${targetWidth}px`;
+            win.style.height = `${targetHeight}px`;
+            win.style.left = `${(window.innerWidth - targetWidth) / 2}px`;
+            win.style.top = `${(window.innerHeight - targetHeight) / 2}px`;
+            win.style.transform = `scale(1)`;
+            
+            isMaximized = false;
+        };
+
+        window.closeApp = function(event) {
+            if(event) event.stopPropagation();
+            
+            if(lastOriginRect) {
+                win.style.width = `${lastOriginRect.width}px`;
+                win.style.height = `${lastOriginRect.height}px`;
+                win.style.left = `${lastOriginRect.left}px`;
+                win.style.top = `${lastOriginRect.top}px`;
+                win.style.transform = `scale(0.5)`;
+            } else {
+                win.style.transform = `scale(0.5) translateY(100px)`;
+            }
+            win.style.opacity = '0';
+            
+            setTimeout(() => {
+                win.classList.remove('open');
+            }, 500);
+        };
+
+        window.toggleMaximize = function(event) {
+            event.stopPropagation();
+            if(!isMaximized) {
+                preMaxState = { top: win.style.top, left: win.style.left, width: win.style.width, height: win.style.height };
+                win.style.top = '20px';
+                win.style.left = '20px';
+                win.style.width = `calc(100vw - 40px)`;
+                win.style.height = `calc(100vh - 120px)`; 
+                isMaximized = true;
+            } else {
+                win.style.top = preMaxState.top;
+                win.style.left = preMaxState.left;
+                win.style.width = preMaxState.width;
+                win.style.height = preMaxState.height;
+                isMaximized = false;
+            }
+        };
+
+        // Make window draggable
+        const dragHandle = document.getElementById('window-drag-handle');
+        let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+
+        dragHandle.onmousedown = dragMouseDown;
+        dragHandle.ontouchstart = dragTouchStart;
+
+        function dragMouseDown(e) {
+            if(isMaximized || e.target.classList.contains('traffic-light')) return;
+            e.preventDefault();
+            pos3 = e.clientX; pos4 = e.clientY;
+            document.onmouseup = closeDragElement;
+            document.onmousemove = elementDrag;
+        }
+
+        function dragTouchStart(e) {
+            if(isMaximized || e.target.classList.contains('traffic-light')) return;
+            pos3 = e.touches[0].clientX; pos4 = e.touches[0].clientY;
+            document.ontouchend = closeDragElement;
+            document.ontouchmove = elementDragTouch;
+        }
+
+        function elementDrag(e) {
+            e.preventDefault();
+            pos1 = pos3 - e.clientX; pos2 = pos4 - e.clientY;
+            pos3 = e.clientX; pos4 = e.clientY;
+            win.style.transition = 'none'; 
+            win.style.top = (win.offsetTop - pos2) + "px";
+            win.style.left = (win.offsetLeft - pos1) + "px";
+        }
+
+        function elementDragTouch(e) {
+            pos1 = pos3 - e.touches[0].clientX; pos2 = pos4 - e.touches[0].clientY;
+            pos3 = e.touches[0].clientX; pos4 = e.touches[0].clientY;
+            win.style.transition = 'none';
+            win.style.top = (win.offsetTop - pos2) + "px";
+            win.style.left = (win.offsetLeft - pos1) + "px";
+        }
+
+        function closeDragElement() {
+            document.onmouseup = null; document.onmousemove = null;
+            document.ontouchend = null; document.ontouchmove = null;
+            win.style.transition = 'all 0.5s cubic-bezier(0.25, 1, 0.5, 1)'; 
+        }
+
+        // === Dock Icon Hover Animation ===
+        const icons = document.querySelectorAll(".ico");
+        const resetIcons = () => icons.forEach(item => item.style.transform = "scale(1) translateY(0px)");
+
+        icons.forEach((item, index) => {
+            item.addEventListener("mouseover", () => {
+                resetIcons();
+                const transformations = [
+                    { idx: index - 2, scale: 1.1, translateY: 0 },
+                    { idx: index - 1, scale: 1.2, translateY: -6 },
+                    { idx: index, scale: 1.5, translateY: -10 },
+                    { idx: index + 1, scale: 1.2, translateY: -6 },
+                    { idx: index + 2, scale: 1.1, translateY: 0 }
+                ];
+                transformations.forEach(({ idx, scale, translateY }) => {
+                    if (icons[idx]) icons[idx].style.transform = `scale(${scale}) translateY(${translateY}px)`;
+                });
+            });
+            item.addEventListener("mouseleave", resetIcons);
+        });
+
+        // === Hero Animation Protocol ===
         document.addEventListener("DOMContentLoaded", () => {
             const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 768;
             const isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
@@ -552,37 +701,39 @@
             
             let targetX = window.innerWidth / 2;
             let targetY = window.innerHeight / 2;
-            let currentX = targetX;
-            let currentY = targetY;
-            let time = 0;
-            let frameCount = 0; 
-            let isAnimating = false;
+            let currentX = targetX, currentY = targetY;
+            let time = 0, isAnimating = false, mouseActive = false;
+            let maskFadeMultiplier = 0, isIdleSwirling = false, idleTime = 0;
+            let centerX = window.innerWidth / 2, centerY = window.innerHeight / 2;
 
-            let mouseActive = false;
-            let mouseTimeout;
-            let maskFadeMultiplier = 0;
-
-            let paraTargetX = 0;
-            let paraTargetY = 0;
-            let paraCurrentX = 0;
-            let paraCurrentY = 0;
-
-            // Idle Animation Variables
-            let isIdleSwirling = false;
-            let idleTime = 0;
-            let idleTimer;
-            let centerX = window.innerWidth / 2;
-            let centerY = window.innerHeight / 2;
-
-            window.addEventListener('resize', () => {
-                centerX = window.innerWidth / 2;
-                centerY = window.innerHeight / 2;
-            });
-
-            // Parallax Elements
             const bgs = document.querySelectorAll('.bg');
             const subjects = document.querySelectorAll('.subject-wrapper');
             const scrollWrappers = document.querySelectorAll('.scroll-text-wrapper');
+            
+            let paraTargetX = 0, paraTargetY = 0;
+            let paraCurrentX = 0, paraCurrentY = 0;
+
+            window.addEventListener('resize', () => { centerX = window.innerWidth / 2; centerY = window.innerHeight / 2; });
+
+            let mouseTimeout, idleTimer;
+            const setMouseActiveState = () => {
+                mouseActive = true;
+                clearTimeout(mouseTimeout);
+                mouseTimeout = setTimeout(() => mouseActive = false, 300);
+                clearTimeout(idleTimer);
+                idleTimer = setTimeout(() => { isIdleSwirling = true; idleTime = 0; }, 3000);
+            };
+
+            const updateTarget = (x, y) => {
+                targetX = x; targetY = y;
+                if (isIdleSwirling) { isIdleSwirling = false; currentX = targetX; currentY = targetY; }
+                paraTargetX = (x - centerX) / centerX;
+                paraTargetY = (y - centerY) / centerY;
+                setMouseActiveState();
+            };
+
+            window.addEventListener("mousemove", (e) => updateTarget(e.clientX, e.clientY));
+            window.addEventListener("touchmove", (e) => updateTarget(e.touches[0].clientX, e.touches[0].clientY), { passive: true });
 
             // Theme Toggle
             let isDarkMode = false;
@@ -606,61 +757,19 @@
             }
 
             const trail = [];
-
-            const setMouseActiveState = () => {
-                mouseActive = true;
-                clearTimeout(mouseTimeout);
-                mouseTimeout = setTimeout(() => { mouseActive = false; }, 300);
-
-                clearTimeout(idleTimer);
-                idleTimer = setTimeout(() => {
-                    isIdleSwirling = true;
-                    idleTime = 0;
-                }, 3000);
-            };
-
-            const updateTarget = (x, y) => {
-                targetX = x;
-                targetY = y;
-                
-                if (isIdleSwirling) {
-                    isIdleSwirling = false;
-                    currentX = targetX;
-                    currentY = targetY;
-                }
-
-                paraTargetX = (x - centerX) / centerX;
-                paraTargetY = (y - centerY) / centerY;
-                
-                setMouseActiveState();
-            };
-
-            window.addEventListener("mousemove", (e) => updateTarget(e.clientX, e.clientY));
-            window.addEventListener("touchmove", (e) => updateTarget(e.touches[0].clientX, e.touches[0].clientY), { passive: true });
-            window.addEventListener("touchstart", (e) => {
-                updateTarget(e.touches[0].clientX, e.touches[0].clientY);
-                currentX = targetX;
-                currentY = targetY;
-            }, { passive: true });
-
             const lerp = (start, end, factor) => start + (end - start) * factor;
 
             const startTime = Date.now();
             window.addEventListener("load", () => {
                 const elapsed = Date.now() - startTime;
                 const remaining = Math.max(0, 3200 - elapsed); 
-                
                 setTimeout(() => {
                     const preloader = document.getElementById("preloader");
                     preloader.style.opacity = "0";
                     setTimeout(() => {
                         preloader.style.display = "none";
                         isAnimating = true;
-                        
-                        idleTimer = setTimeout(() => {
-                            isIdleSwirling = true;
-                        }, 3000);
-
+                        idleTimer = setTimeout(() => { isIdleSwirling = true; }, 3000);
                         animate(); 
                     }, 800); 
                 }, remaining);
@@ -668,15 +777,12 @@
 
             function animate() {
                 if (!isAnimating) return;
-
-                frameCount++;
                 time += 0.1;
 
                 if (isIdleSwirling) {
                     idleTime += 0.025; 
                     targetX = centerX + Math.sin(idleTime * 1.3) * (centerX * 0.6) + Math.sin(idleTime * 2.8) * (centerX * 0.2);
                     targetY = centerY + Math.cos(idleTime * 0.9) * (centerY * 0.6) + Math.sin(idleTime * 2.1) * (centerY * 0.2);
-
                     paraTargetX = ((targetX - centerX) / centerX) * 0.4;
                     paraTargetY = ((targetY - centerY) / centerY) * 0.4;
                     maskFadeMultiplier = lerp(maskFadeMultiplier, 1, 0.05);
@@ -684,110 +790,48 @@
                     maskFadeMultiplier = lerp(maskFadeMultiplier, mouseActive ? 1 : 0, mouseActive ? 0.1 : 0.08);
                 }
 
-                let dx = targetX - currentX;
-                let dy = targetY - currentY;
+                let dx = targetX - currentX, dy = targetY - currentY;
                 let distance = Math.sqrt(dx*dx + dy*dy);
-                let velocity = distance;
-
                 if (distance > 0) {
-                    let activeDist = distance;
-                    if (distance > 30) {
-                        activeDist = 30 + Math.sqrt(distance - 30) * 8; 
-                    }
+                    let activeDist = distance > 30 ? 30 + Math.sqrt(distance - 30) * 8 : distance;
                     currentX += (dx / distance) * activeDist * LAG_FACTOR;
                     currentY += (dy / distance) * activeDist * LAG_FACTOR;
                 }
 
-                trail.unshift({ x: currentX, y: currentY, vel: velocity });
-                if (trail.length > TRAIL_LENGTH) {
-                    trail.pop();
-                }
+                trail.unshift({ x: currentX, y: currentY, vel: distance });
+                if (trail.length > TRAIL_LENGTH) trail.pop();
 
-                // Batch SVG DOM Updates
-                let len = trail.length;
                 let dynamicRadius = MAIN_RADIUS * Math.pow(maskFadeMultiplier, 0.5);
-                
                 for (let i = 0; i < TRAIL_LENGTH; i++) {
                     const circle = maskCircles[i];
-                    
-                    if (i < len && maskFadeMultiplier > 0.01) {
-                        let point = trail[i];
-                        let progress = i / TRAIL_LENGTH;
-                        let rawOpacity = Math.max(0, 1 - Math.pow(progress, 1.2));
-                        let opacity = (rawOpacity * maskFadeMultiplier).toFixed(2);
-                        
-                        if (opacity < 0.02) {
-                            circle.setAttribute('r', '0');
-                            continue;
-                        }
+                    if (i < trail.length && maskFadeMultiplier > 0.01) {
+                        let point = trail[i], progress = i / TRAIL_LENGTH;
+                        let opacity = (Math.max(0, 1 - Math.pow(progress, 1.2)) * maskFadeMultiplier).toFixed(2);
+                        if (opacity < 0.02) { circle.setAttribute('r', '0'); continue; }
                         
                         let baseSize = dynamicRadius + (Math.min(point.vel * 0.8, 30));
                         let ripple = Math.sin(i * 0.4 - time * 2) * (15 * (1 - progress));
                         let size = Math.max(0, (baseSize * (1 - progress * 0.5)) + ripple).toFixed(1);
                         
-                        let wobbleX = Math.cos(i * 0.25 + time * 1.2) * (20 * progress);
-                        let wobbleY = Math.sin(i * 0.3 - time * 1.5) * (20 * progress);
-                        
-                        let finalX = (point.x + wobbleX).toFixed(1);
-                        let finalY = (point.y + wobbleY).toFixed(1);
+                        let finalX = (point.x + Math.cos(i * 0.25 + time * 1.2) * (20 * progress)).toFixed(1);
+                        let finalY = (point.y + Math.sin(i * 0.3 - time * 1.5) * (20 * progress)).toFixed(1);
 
-                        circle.setAttribute('cx', finalX);
-                        circle.setAttribute('cy', finalY);
-                        circle.setAttribute('r', size);
-                        circle.setAttribute('opacity', opacity);
+                        circle.setAttribute('cx', finalX); circle.setAttribute('cy', finalY);
+                        circle.setAttribute('r', size); circle.setAttribute('opacity', opacity);
                     } else {
                         circle.setAttribute('r', '0');
                     }
                 }
 
-                // Smooth Parallax Updates
                 paraCurrentX = lerp(paraCurrentX, paraTargetX, 0.05);
                 paraCurrentY = lerp(paraCurrentY, paraTargetY, 0.05);
 
-                let transX_bg = (paraCurrentX * -20).toFixed(1);
-                let transY_bg = (paraCurrentY * -20).toFixed(1);
-                let transX_sub = (paraCurrentX * 15).toFixed(1);
-                let transY_sub = (paraCurrentY * 15).toFixed(1);
-                let transX_text = (paraCurrentX * 30).toFixed(1);
-                let transY_text = (paraCurrentY * 30).toFixed(1);
-
-                bgs.forEach(bg => bg.style.transform = `translate3d(${transX_bg}px, ${transY_bg}px, 0)`);
-                subjects.forEach(sub => sub.style.transform = `translate3d(${transX_sub}px, ${transY_sub}px, 0)`);
-                scrollWrappers.forEach(sw => sw.style.transform = `translate3d(${transX_text}px, ${transY_text}px, 0)`);
+                bgs.forEach(bg => bg.style.transform = `translate3d(${(paraCurrentX * -20).toFixed(1)}px, ${(paraCurrentY * -20).toFixed(1)}px, 0)`);
+                subjects.forEach(sub => sub.style.transform = `translate3d(${(paraCurrentX * 15).toFixed(1)}px, ${(paraCurrentY * 15).toFixed(1)}px, 0)`);
+                scrollWrappers.forEach(sw => sw.style.transform = `translate3d(${(paraCurrentX * 30).toFixed(1)}px, ${(paraCurrentY * 30).toFixed(1)}px, 0)`);
 
                 requestAnimationFrame(animate);
             }
-
-            // --- macOS Dock Javascript ---
-            const icons = document.querySelectorAll(".ico");
-
-            const resetIcons = () => {
-                icons.forEach((item) => {
-                    item.style.transform = "scale(1) translateY(0px)";
-                });
-            };
-
-            icons.forEach((item, index) => {
-                item.addEventListener("mouseover", () => focusIcon(index));
-                item.addEventListener("mouseleave", resetIcons);
-            });
-
-            const focusIcon = (index) => {
-                resetIcons();
-                const transformations = [
-                    { idx: index - 2, scale: 1.1, translateY: 0 },
-                    { idx: index - 1, scale: 1.2, translateY: -6 },
-                    { idx: index, scale: 1.5, translateY: -10 },
-                    { idx: index + 1, scale: 1.2, translateY: -6 },
-                    { idx: index + 2, scale: 1.1, translateY: 0 }
-                ];
-
-                transformations.forEach(({ idx, scale, translateY }) => {
-                    if (icons[idx]) {
-                        icons[idx].style.transform = `scale(${scale}) translateY(${translateY}px)`;
-                    }
-                });
-            };
         });
     </script>
 </body>
