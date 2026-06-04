@@ -156,6 +156,7 @@
             overflow: hidden; display: none; flex-direction: column;
             pointer-events: none; z-index: 900;
             font-family: var(--font-apple);
+            will-change: transform, opacity; /* Optimized for smooth animations */
         }
         
         body.dark-mode .mac-window {
@@ -251,6 +252,17 @@
         .note-view-content p { margin-bottom: 16px; }
         .note-view-content strong { font-weight: 600; color: #000; }
         body.dark-mode .note-view-content strong { color: #fff; }
+
+        /* Custom Resize Handle */
+        .resize-handle {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 20px;
+            height: 20px;
+            cursor: nwse-resize;
+            z-index: 1000;
+        }
 
         /* Content Image Styling */
         .note-view-content img {
@@ -479,6 +491,9 @@
                 <div class="note-view-content" id="noteContent"></div>
             </div>
         </div>
+        
+        <!-- Resize handle for the window -->
+        <div class="resize-handle" id="window-resize-handle"></div>
     </div>
 
     <script>
@@ -555,8 +570,6 @@
         let isMaximized = false;
         let preMaxState = { top: 0, left: 0, width: 0, height: 0 };
         const win = document.getElementById('mac-window');
-        
-        win.style.transition = 'all 0.5s cubic-bezier(0.25, 1, 0.5, 1)';
 
         window.openApp = function(event, appName) {
             event.stopPropagation();
@@ -575,32 +588,43 @@
             
             document.getElementById('window-title').innerText = appName;
             
-            win.style.transition = 'none';
-            win.style.top = `${lastOriginRect.top}px`;
-            win.style.left = `${lastOriginRect.left}px`;
-            win.style.width = `${lastOriginRect.width}px`;
-            win.style.height = `${lastOriginRect.height}px`;
-            win.style.transform = `scale(0.5)`;
-            win.style.opacity = '0';
-            win.classList.add('open');
-            
-            void win.offsetWidth;
-            
-            win.style.transition = 'all 0.5s cubic-bezier(0.25, 1, 0.5, 1)';
-            win.style.opacity = '1';
-            
+            // 1. Calculate final dimensions
             let targetWidth = window.innerWidth * 0.6;
             let targetHeight = window.innerHeight * 0.6;
             if(window.innerWidth < 768) {
                  targetWidth = window.innerWidth * 0.9;
                  targetHeight = window.innerHeight * 0.8;
             }
-            
+            let targetLeft = (window.innerWidth - targetWidth) / 2;
+            let targetTop = (window.innerHeight - targetHeight) / 2;
+
+            // 2. Set dimensions immediately (No transition to prevent layout lag)
+            win.style.transition = 'none';
             win.style.width = `${targetWidth}px`;
             win.style.height = `${targetHeight}px`;
-            win.style.left = `${(window.innerWidth - targetWidth) / 2}px`;
-            win.style.top = `${(window.innerHeight - targetHeight) / 2}px`;
-            win.style.transform = `scale(1)`;
+            win.style.left = `${targetLeft}px`;
+            win.style.top = `${targetTop}px`;
+            
+            // 3. Calculate start transform (from icon position)
+            let targetCx = targetLeft + targetWidth / 2;
+            let targetCy = targetTop + targetHeight / 2;
+            let iconCx = lastOriginRect.left + lastOriginRect.width / 2;
+            let iconCy = lastOriginRect.top + lastOriginRect.height / 2;
+            
+            let tx = iconCx - targetCx;
+            let ty = iconCy - targetCy;
+            
+            // Apply start state
+            win.style.transform = `translate(${tx}px, ${ty}px) scale(0.05)`;
+            win.style.opacity = '0';
+            win.classList.add('open');
+            
+            void win.offsetWidth; // Force reflow
+            
+            // 4. Animate ONLY transform and opacity (GPU accelerated)
+            win.style.transition = 'transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1), opacity 0.3s ease-out';
+            win.style.transform = `translate(0px, 0px) scale(1)`;
+            win.style.opacity = '1';
             
             isMaximized = false;
         };
@@ -608,24 +632,35 @@
         window.closeApp = function(event) {
             if(event) event.stopPropagation();
             
+            win.style.transition = 'transform 0.35s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.25s ease-in';
+            
             if(lastOriginRect) {
-                win.style.width = `${lastOriginRect.width}px`;
-                win.style.height = `${lastOriginRect.height}px`;
-                win.style.left = `${lastOriginRect.left}px`;
-                win.style.top = `${lastOriginRect.top}px`;
-                win.style.transform = `scale(0.5)`;
+                let rect = win.getBoundingClientRect();
+                let targetCx = rect.left + rect.width / 2;
+                let targetCy = rect.top + rect.height / 2;
+                
+                let iconCx = lastOriginRect.left + lastOriginRect.width / 2;
+                let iconCy = lastOriginRect.top + lastOriginRect.height / 2;
+                
+                let tx = iconCx - targetCx;
+                let ty = iconCy - targetCy;
+                
+                win.style.transform = `translate(${tx}px, ${ty}px) scale(0.05)`;
             } else {
-                win.style.transform = `scale(0.5) translateY(100px)`;
+                win.style.transform = `translate(0px, 100px) scale(0.5)`;
             }
             win.style.opacity = '0';
             
             setTimeout(() => {
                 win.classList.remove('open');
-            }, 500);
+                win.style.transform = 'none'; // Reset
+            }, 350);
         };
 
         window.toggleMaximize = function(event) {
             event.stopPropagation();
+            // Only transition dimensions/positions for maximize
+            win.style.transition = 'top 0.4s ease, left 0.4s ease, width 0.4s ease, height 0.4s ease';
             if(!isMaximized) {
                 preMaxState = { top: win.style.top, left: win.style.left, width: win.style.width, height: win.style.height };
                 win.style.top = '20px';
@@ -684,7 +719,76 @@
         function closeDragElement() {
             document.onmouseup = null; document.onmousemove = null;
             document.ontouchend = null; document.ontouchmove = null;
-            win.style.transition = 'all 0.5s cubic-bezier(0.25, 1, 0.5, 1)'; 
+            win.style.transition = 'none'; // Ensure no laggy layout transitions persist
+        }
+
+        // === Custom Resize Logic ===
+        const resizeHandleObj = document.getElementById('window-resize-handle');
+        let isResizing = false;
+        let startX, startY, startWidth, startHeight;
+
+        resizeHandleObj.addEventListener('mousedown', function(e) {
+            if(isMaximized) return; // Prevent resize when maximized
+            e.preventDefault();
+            e.stopPropagation();
+            isResizing = true;
+            startX = e.clientX;
+            startY = e.clientY;
+            startWidth = win.offsetWidth;
+            startHeight = win.offsetHeight;
+            
+            win.style.transition = 'none';
+            
+            document.addEventListener('mousemove', doResize);
+            document.addEventListener('mouseup', stopResize);
+        });
+
+        resizeHandleObj.addEventListener('touchstart', function(e) {
+            if(isMaximized) return; 
+            e.stopPropagation();
+            isResizing = true;
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+            startWidth = win.offsetWidth;
+            startHeight = win.offsetHeight;
+            
+            win.style.transition = 'none';
+            
+            document.addEventListener('touchmove', doResizeTouch, {passive: false});
+            document.addEventListener('touchend', stopResizeTouch);
+        });
+
+        function doResize(e) {
+            if(!isResizing) return;
+            requestAnimationFrame(() => {
+                let newWidth = Math.max(startWidth + (e.clientX - startX), 320);
+                let newHeight = Math.max(startHeight + (e.clientY - startY), 240);
+                win.style.width = newWidth + 'px';
+                win.style.height = newHeight + 'px';
+            });
+        }
+
+        function stopResize(e) {
+            isResizing = false;
+            document.removeEventListener('mousemove', doResize);
+            document.removeEventListener('mouseup', stopResize);
+        }
+
+        function doResizeTouch(e) {
+            if(!isResizing) return;
+            e.preventDefault();
+            requestAnimationFrame(() => {
+                let newWidth = Math.max(startWidth + (e.touches[0].clientX - startX), 320);
+                let newHeight = Math.max(startHeight + (e.touches[0].clientY - startY), 240);
+                win.style.width = newWidth + 'px';
+                win.style.height = newHeight + 'px';
+            });
+        }
+
+        function stopResizeTouch(e) {
+            isResizing = false;
+            document.removeEventListener('touchmove', doResizeTouch);
+            document.removeEventListener('touchend', stopResizeTouch);
         }
 
         // === Dock Icon Hover Animation ===
