@@ -44,20 +44,11 @@
 
         .app-container {
             width: 100%;
-            max-width: 550px; /* Increased slightly for better desktop viewing */
             background-color: var(--bg-color);
             min-height: 100vh;
             position: relative;
             overflow-x: hidden;
-            box-shadow: 0 0 30px rgba(0,0,0,0.1);
-            padding-bottom: 2rem;
-            container-type: inline-size; /* Allows proportional scaling */
-        }
-
-        @media (max-width: 550px) {
-            .app-container {
-                box-shadow: none;
-            }
+            padding-bottom: 8vw;
         }
 
         /* Typography Classes */
@@ -94,7 +85,7 @@
         }
 
         #preloader img {
-            width: 120px;
+            width: 25vw;
             animation: pulse 1.5s infinite ease-in-out;
         }
 
@@ -107,7 +98,7 @@
         /* Scroll Animations */
         .animate-on-scroll {
             opacity: 0;
-            transform: translateY(30px);
+            transform: translateY(4vw);
             transition: opacity 0.8s ease-out, transform 0.8s ease-out;
         }
 
@@ -116,13 +107,13 @@
             transform: translateY(0);
         }
 
-        /* Layout Utilities */
-        .px-4 { padding-left: 1rem; padding-right: 1rem; }
-        .mb-2 { margin-bottom: 0.25rem; }
-        .mb-4 { margin-bottom: 0.75rem; }
-        .mb-6 { margin-bottom: 1.25rem; }
-        .mb-8 { margin-bottom: 1.5rem; }
-        .mt-4 { margin-top: 0.75rem; }
+        /* Layout Utilities - Now purely fluid */
+        .px-4 { padding-left: 4vw; padding-right: 4vw; }
+        .mb-2 { margin-bottom: 2vw; }
+        .mb-4 { margin-bottom: 4vw; }
+        .mb-6 { margin-bottom: 6vw; }
+        .mb-8 { margin-bottom: 8vw; }
+        .mt-4 { margin-top: 4vw; }
         
         .flex { display: flex; }
         .flex-col { flex-direction: column; }
@@ -131,8 +122,8 @@
         .items-center { align-items: center; }
         .items-start { align-items: flex-start; }
         .items-end { align-items: flex-end; }
-        .gap-2 { gap: 0.5rem; }
-        .gap-4 { gap: 1rem; }
+        .gap-2 { gap: 2vw; }
+        .gap-4 { gap: 4vw; }
         .text-center { text-align: center; }
         .text-right { text-align: right; }
         .relative { position: relative; }
@@ -140,24 +131,24 @@
 
         /* Specific Section Adjustments */
         .header-logo {
-            width: 120px;
-            margin: 1rem auto 1.5rem auto;
+            width: 28vw;
+            margin: 4vw auto 6vw auto;
             display: block;
         }
 
         .hero-title {
-            font-size: 32cqi; /* Scales dynamically with the container width */
-            margin-top: -10px;
+            font-size: 42vw; 
+            margin-top: -3vw;
             margin-bottom: 0;
             padding-bottom: 0.1em;
+            letter-spacing: 0.02em;
         }
 
         .hero-image-container {
             position: relative;
             width: 100%;
-            height: 75cqi; /* Better dynamic height scaling */
-            max-height: 500px;
-            margin-bottom: 1.5rem;
+            height: 75vw;
+            margin-bottom: 6vw;
             overflow: hidden;
         }
 
@@ -178,7 +169,7 @@
         }
 
         .why-section {
-            margin-top: 1.5rem;
+            margin-top: 6vw;
         }
 
         .why-image-wrapper {
@@ -189,25 +180,25 @@
         .why-image {
             width: 150%;
             position: relative;
-            left: -15px;
-            top: -10px;
+            left: -4vw;
+            top: -2.5vw;
             z-index: 2;
         }
 
         .why-text-wrapper {
             width: 50%;
-            padding-top: 10px;
+            padding-top: 2.5vw;
             position: relative;
             z-index: 3;
         }
 
         .thats-where-container {
-            margin-top: 1.5rem;
+            margin-top: 6vw;
         }
 
         .circle-max {
             width: 75%;
-            margin: -25px auto -35px auto;
+            margin: -6vw auto -8vw auto;
             display: block;
             position: relative;
             z-index: 2;
@@ -216,35 +207,35 @@
         .about-me-grid {
             display: flex;
             justify-content: space-between;
-            gap: 1rem;
-            margin-top: 1rem;
+            gap: 4vw;
+            margin-top: 4vw;
         }
 
         .about-col-left {
             width: 48%;
             display: flex;
             flex-direction: column;
-            gap: 1.25rem;
+            gap: 5vw;
         }
 
         .about-col-right {
             width: 48%;
             display: flex;
             flex-direction: column;
-            gap: 1.25rem;
-            padding-top: 2rem;
+            gap: 5vw;
+            padding-top: 8vw;
         }
 
         .niche-reels-container {
             position: relative;
-            margin-top: 0.5rem;
+            margin-top: 2vw;
         }
         
         .arrow-img {
             position: absolute;
-            width: 45px;
-            left: -25px;
-            top: 15px;
+            width: 12vw;
+            left: -6vw;
+            top: 4vw;
             transform: rotate(-10deg);
         }
 
@@ -271,7 +262,7 @@
 
         <!-- Intro Section -->
         <section class="px-4 mb-4 animate-on-scroll">
-            <p class="font-roboto text-magenta" style="font-size: 1.5rem; padding-bottom: 0.2em;">Hi, my name is</p>
+            <p class="font-roboto text-magenta" style="font-size: 6vw; padding-bottom: 0.2em;">Hi, my name is</p>
             <h1 class="font-anton text-purple hero-title">MAX</h1>
         </section>
 
@@ -283,7 +274,7 @@
 
         <!-- Running For -->
         <section class="px-4 mb-8 animate-on-scroll">
-            <p class="font-roboto text-magenta" style="font-size: 1.8rem;">
+            <p class="font-roboto text-magenta" style="font-size: 7.2vw;">
                 And I'm running to<br>
                 be your next VP<br>
                 Communications<br>
@@ -297,26 +288,26 @@
                 <img src="maxTwo.webp" alt="Max Shrugging" class="why-image">
             </div>
             <div class="why-text-wrapper">
-                <h2 class="font-anton text-purple mb-2" style="font-size: 3.2rem;">BUT WHY?</h2>
-                <p class="font-roboto text-magenta mb-4" style="font-size: 1.25rem;">
+                <h2 class="font-anton text-purple mb-2" style="font-size: 13vw;">BUT WHY?</h2>
+                <p class="font-roboto text-magenta mb-4" style="font-size: 5vw;">
                     Dawson is an<br>
                     amazing school<br>
                     with toooons of<br>
                     opportunity...
                 </p>
-                <img src="andThatsGreat.webp" alt="AND THAT'S GREAT!" style="width: 100%; max-width: 260px; display: block; margin-top: 1rem; transform: rotate(-6deg);">
+                <img src="andThatsGreat.webp" alt="AND THAT'S GREAT!" style="width: 100%; display: block; margin-top: 4vw; transform: rotate(-6deg);">
             </div>
         </section>
 
         <!-- The Catch Section -->
         <section class="px-4 text-center mb-8 animate-on-scroll">
-            <h2 class="font-anton text-purple mb-4" style="font-size: 3.8rem; line-height: 0.95;">
+            <h2 class="font-anton text-purple mb-4" style="font-size: 15.5vw; line-height: 0.95;">
                 ...SO WHAT'S<br>THE CATCH?
             </h2>
-            <p class="font-roboto text-magenta mb-2" style="font-size: 1.4rem;">Right now, it feels</p>
-            <img src="impossible.webp" alt="IMPOSSIBLE" style="width: 85%; max-width: 380px; margin: 0 auto 1rem auto; display: block; transform: rotate(-4deg);">
-            <p class="font-roboto text-magenta mb-6" style="font-size: 1.4rem;">to actually find any of it.</p>
-            <p class="font-roboto text-magenta" style="font-size: 1.25rem; margin: 0 1rem;">
+            <p class="font-roboto text-magenta mb-2" style="font-size: 5.8vw;">Right now, it feels</p>
+            <img src="impossible.webp" alt="IMPOSSIBLE" style="width: 88vw; margin: 0 auto 4vw auto; display: block; transform: rotate(-4deg);">
+            <p class="font-roboto text-magenta mb-6" style="font-size: 5.8vw;">to actually find any of it.</p>
+            <p class="font-roboto text-magenta" style="font-size: 5.2vw; margin: 0 4vw;">
                 Discovering basic info<br>
                 on clubs and activities<br>
                 shouldn't feel like a<br>
@@ -326,30 +317,30 @@
 
         <!-- That's Where I'd Come In -->
         <section class="px-4 thats-where-container mb-8 animate-on-scroll">
-            <h2 class="font-anton text-purple relative" style="font-size: 3.2rem; z-index: 3;">THAT'S WHERE</h2>
+            <h2 class="font-anton text-purple relative" style="font-size: 13vw; z-index: 3;">THAT'S WHERE</h2>
             <img src="maxThree.webp" alt="Max Pointing to Self" class="circle-max">
-            <h2 class="font-anton text-purple text-right relative" style="font-size: 4.2rem; z-index: 3; margin-top: -10px;">I'D<br>COME IN.</h2>
+            <h2 class="font-anton text-purple text-right relative" style="font-size: 17vw; z-index: 3; margin-top: -3vw;">I'D<br>COME IN.</h2>
         </section>
 
         <!-- About Me Section -->
         <section class="px-4 mb-8">
-            <h2 class="font-anton text-purple mb-2 animate-on-scroll" style="font-size: 3.2rem; line-height: 0.95;">SOME<br>THINGS<br>ABOUT ME!</h2>
+            <h2 class="font-anton text-purple mb-2 animate-on-scroll" style="font-size: 13vw; line-height: 0.95;">SOME<br>THINGS<br>ABOUT ME!</h2>
             
             <div class="about-me-grid">
                 <!-- Left Column -->
                 <div class="about-col-left">
                     <div class="animate-on-scroll">
-                        <p class="font-roboto text-magenta mb-2" style="font-size: 1.05rem;">
+                        <p class="font-roboto text-magenta mb-2" style="font-size: 4.2vw;">
                             I've worked in<br>communications for a<br>robotics team for over 2<br>years.
                         </p>
-                        <p class="font-roboto text-magenta mb-2" style="font-size: 0.8rem;">
+                        <p class="font-roboto text-magenta mb-2" style="font-size: 3.2vw;">
                             (and actually learned<br>how to make a website)
                         </p>
-                        <img src="roboticsSite.webp" alt="Robotics Website" class="w-full" style="border-radius: 6px;">
+                        <img src="roboticsSite.webp" alt="Robotics Website" class="w-full" style="border-radius: 1.5vw;">
                     </div>
                     
                     <div class="animate-on-scroll">
-                        <p class="font-roboto text-magenta mb-2" style="font-size: 1.05rem;">
+                        <p class="font-roboto text-magenta mb-2" style="font-size: 4.2vw;">
                             I'm a photographer!<br>(shoutout<br><a href="https://instagram.com/pixwithmax" target="_blank" style="color: inherit; text-decoration: underline;">@pixwithmax</a>)
                         </p>
                         <img src="maxFour.webp" alt="Max with Camera" style="width: 70%; margin: 0 auto; display: block;">
@@ -359,21 +350,21 @@
                 <!-- Right Column -->
                 <div class="about-col-right">
                     <div class="animate-on-scroll">
-                        <p class="font-roboto text-magenta" style="font-size: 1.05rem;">
+                        <p class="font-roboto text-magenta" style="font-size: 4.2vw;">
                             I like to create niche<br>reels like these...
                         </p>
                         <div class="niche-reels-container">
                             <img src="arrow.webp" alt="Arrow pointing" class="arrow-img">
-                            <img src="nicheReels.webp" alt="Niche Reels Example" style="width: 85%; margin-left: auto; display: block; border-radius: 6px;">
+                            <img src="nicheReels.webp" alt="Niche Reels Example" style="width: 85%; margin-left: auto; display: block; border-radius: 1.5vw;">
                         </div>
                     </div>
 
                     <div class="animate-on-scroll">
-                        <p class="font-roboto text-magenta mb-2" style="font-size: 1.05rem;">
+                        <p class="font-roboto text-magenta mb-2" style="font-size: 4.2vw;">
                             I managed my<br>school's meme<br>account :D
                         </p>
-                        <img src="softVemes.webp" alt="Meme Account" class="w-full" style="border-radius: 6px;">
-                        <p class="font-roboto text-magenta text-right mt-2" style="font-size: 0.7rem;">
+                        <img src="softVemes.webp" alt="Meme Account" class="w-full" style="border-radius: 1.5vw;">
+                        <p class="font-roboto text-magenta text-right mt-4" style="font-size: 2.8vw;">
                             (Also I have canva premium...<br>subtle flex ;))
                         </p>
                     </div>
@@ -383,28 +374,28 @@
 
         <!-- My Plans Section -->
         <section class="px-4 mb-8">
-            <h2 class="font-anton text-purple mb-6 animate-on-scroll" style="font-size: 3.5rem;">MY PLANS?</h2>
+            <h2 class="font-anton text-purple mb-6 animate-on-scroll" style="font-size: 14vw;">MY PLANS?</h2>
 
             <div class="flex items-center gap-4 mb-6 animate-on-scroll">
-                <img src="laptop.webp" alt="Laptop Icon" style="width: 90px; object-fit: contain;">
-                <p class="font-roboto text-magenta" style="font-size: 1.15rem;">
+                <img src="laptop.webp" alt="Laptop Icon" style="width: 22vw; object-fit: contain;">
+                <p class="font-roboto text-magenta" style="font-size: 4.8vw;">
                     I'll maintain a properly<br>
                     updated website with all the<br>
-                    clubs and activities LIVE
+                    clubs and activities <span class="skew-italic">LIVE</span>
                 </p>
             </div>
 
             <div class="flex items-center gap-4 mb-6 animate-on-scroll">
-                <p class="font-roboto text-magenta text-right" style="flex: 1; font-size: 1.15rem;">
+                <p class="font-roboto text-magenta text-right" style="flex: 1; font-size: 4.8vw;">
                     Also, weekly reels that<br>
                     ppl will actually watch!
                 </p>
-                <img src="scrollReels.webp" alt="Scrolling Reels" style="width: 90px; border-radius: 50%; object-fit: cover;">
+                <img src="scrollReels.webp" alt="Scrolling Reels" style="width: 22vw; border-radius: 50%; object-fit: cover;">
             </div>
 
             <div class="flex items-center gap-4 mb-8 animate-on-scroll">
-                <img src="updateBell.webp" alt="Notification Bell" style="width: 70px; margin-left: 10px; object-fit: contain;">
-                <p class="font-roboto text-magenta" style="font-size: 1.15rem;">
+                <img src="updateBell.webp" alt="Notification Bell" style="width: 18vw; margin-left: 2vw; object-fit: contain;">
+                <p class="font-roboto text-magenta" style="font-size: 4.8vw;">
                     Updates that<br>
                     aren't just a single<br>
                     insta story.
@@ -414,24 +405,24 @@
 
         <!-- Interested / CTA Section -->
         <section class="px-4 text-center mt-4 pb-8 animate-on-scroll">
-            <img src="interested.webp" alt="INTERESTED?" style="width: 85%; max-width: 360px; margin: 0 auto 1rem auto; display: block;">
-            <p class="font-roboto text-purple mb-6" style="font-size: 1.3rem;">Check out my stuff!</p>
+            <img src="interested.webp" alt="INTERESTED?" style="width: 88vw; margin: 0 auto 4vw auto; display: block;">
+            <p class="font-roboto text-purple mb-6" style="font-size: 5.5vw;">Check out my stuff!</p>
 
             <div class="flex justify-center items-end gap-2">
                 <div class="flex flex-col items-center" style="width: 32%;">
                     <a href="https://instagram.com/max4vpcomms" target="_blank" style="text-decoration: none; display: flex; flex-direction: column; align-items: center;">
-                        <img src="instaLogo.webp" alt="Instagram Logo" style="width: 65px; margin-bottom: 5px;">
-                        <p class="font-roboto text-magenta" style="font-size: 0.75rem;">@max4vpcomms</p>
+                        <img src="instaLogo.webp" alt="Instagram Logo" style="width: 16vw; margin-bottom: 2vw;">
+                        <p class="font-roboto text-magenta" style="font-size: 3.2vw;">@max4vpcomms</p>
                     </a>
                 </div>
                 <div class="flex flex-col items-center" style="width: 32%;">
                     <a href="https://instagram.com/mtyw.ca" target="_blank" style="text-decoration: none; display: flex; flex-direction: column; align-items: center;">
-                        <img src="instaLogo.webp" alt="Instagram Logo" style="width: 65px; margin-bottom: 5px;">
-                        <p class="font-roboto text-magenta" style="font-size: 0.75rem;">@mtyw.ca</p>
+                        <img src="instaLogo.webp" alt="Instagram Logo" style="width: 16vw; margin-bottom: 2vw;">
+                        <p class="font-roboto text-magenta" style="font-size: 3.2vw;">@mtyw.ca</p>
                     </a>
                 </div>
                 <div class="flex flex-col items-center mb-1" style="width: 32%;">
-                    <img src="portfolioComing.webp" alt="Portfolio Coming Soon" style="width: 100%; max-width: 90px;">
+                    <img src="portfolioComing.webp" alt="Portfolio Coming Soon" style="width: 23vw;">
                 </div>
             </div>
         </section>
