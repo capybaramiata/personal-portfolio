@@ -3,1029 +3,476 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Portfolio | Max Tianyu Wang</title>
-    <link rel="icon" type="image/svg+xml" href="logo.svg">
-    <meta name="description" content="Portfolio of Max Tianyu Wang. Explore interactive projects in photography, digital media and other creative mediums.">
-    <meta property="og:title" content="Max Tianyu Wang | Portfolio">
-    <meta property="og:description" content="Interactive portfolio and projects by Max Tianyu Wang.">
-    <meta property="og:image" content="https://mtyw.ca/IMG_0336.PNG"> 
+    <title>Max for DSU VP Communications</title>
+    <link rel="icon" type="image/webp" href="mtywLogo.webp">
+    <meta name="description" content="Hi, my name is Max! I'm running to be your next VP Communications for the DSU. Check out my platform and plans.">
+    <meta property="og:title" content="Max Tianyu Wang | VP Communications Campaign">
+    <meta property="og:description" content="Discovering basic info on clubs and activities shouldn't feel like a scavenger hunt. Here is my plan for the DSU.">
+    <meta property="og:image" content="https://mtyw.ca/maxOne.webp"> 
     <meta property="og:url" content="https://mtyw.ca/">
     <meta property="og:type" content="website">
-    
     <meta name="twitter:card" content="summary_large_image">
+
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Plaster&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
     <style>
-        /* === CSS Custom Properties === */
         :root {
-            --bg-base-light: #ebebeb;
-            --bg-base-dark: #000;
-            
-            --text-main-light: #000;
-            --text-main-dark: #fff;
-            
-            --text-sub-light: #444;
-            --text-sub-dark: #ddd;
-            
-            --text-sub-light-alt: #bbb;
-            --text-sub-dark-alt: #222;
-
-            --pad: 40px;
-            --icon-size: 24px;
-            --transition: 0.6s ease-in-out;
-            --font-serif: 'Instrument Serif', serif;
-            --font-display: 'Plaster', serif;
-            --font-apple: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            --bg-color: #f4f3eb;
+            --primary-purple: #3400a3;
+            --accent-magenta: #b31cab;
+            --black: #000000;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body, html {
-            width: 100vw; height: 100vh;
-            overflow: hidden;
-            background-color: var(--bg-base-light); 
-            font-family: var(--font-serif);
-            overscroll-behavior: none;
-            cursor: auto; 
-            transition: background-color var(--transition);
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
-        body.dark-mode { background-color: var(--bg-base-dark); }
+        body {
+            background-color: var(--bg-color);
+            font-family: "Roboto", Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
 
-        /* === Preloader === */
+        .app-container {
+            width: 100%;
+            max-width: 480px; /* Mobile width constraint for desktop */
+            background-color: var(--bg-color);
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+            box-shadow: 0 0 30px rgba(0,0,0,0.1);
+            padding-bottom: 2rem;
+        }
+
+        @media (max-width: 480px) {
+            .app-container {
+                box-shadow: none;
+            }
+        }
+
+        /* Typography Classes */
+        .font-anton {
+            font-family: "Anton", sans-serif;
+            line-height: 1.05;
+            text-transform: uppercase;
+        }
+
+        .font-roboto {
+            font-family: "Roboto", Arial, sans-serif;
+            font-weight: 700;
+            letter-spacing: -0.036em;
+            line-height: 0.79;
+        }
+
+        .text-purple { color: var(--primary-purple); }
+        .text-magenta { color: var(--accent-magenta); }
+        .text-black { color: var(--black); }
+
+        /* Preloader */
         #preloader {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background-color: var(--bg-base-dark); z-index: 9999;
-            display: flex; justify-content: center; align-items: center;
-            transition: opacity 0.8s ease-in-out; pointer-events: none;
-        }
-        #preloader img { width: 200px; height: 200px; object-fit: contain; }
-        @media (max-width: 768px) { #preloader img { width: 120px; height: 120px; } }
-
-        /* === Core Architecture === */
-        .reveal-container { position: relative; width: 100vw; height: 100vh; }
-        .layer { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; }
-        .base-layer { z-index: 1; }
-        .reveal-layer { z-index: 2; transform: translateZ(0); }
-
-        /* === Backgrounds & Subjects === */
-        .layer-img {
-            position: absolute; top: -5%; left: -5%; width: 110%; height: 110%;
-            object-fit: cover; object-position: center; transform-origin: center;
-            will-change: transform; transition: filter var(--transition);
-        }
-        .reveal-layer .bg { filter: brightness(0.4) contrast(1.3); }
-        body.dark-mode .base-layer .bg { filter: brightness(0.25) contrast(1.2); }
-        body.dark-mode .reveal-layer .bg { filter: none; }
-
-        .subject-wrapper {
-            position: absolute; top: -5%; left: -5%; width: 110%; height: 110%;
-            display: flex; justify-content: center; align-items: flex-end;
-            will-change: transform; z-index: 2;
-        }
-        .subject-img {
-            height: 90%; width: auto; object-fit: contain;
-            transform-origin: bottom center; position: absolute; transition: opacity var(--transition);
-        }
-        .img-light { opacity: 1; } .img-dark { opacity: 0; }
-        body.dark-mode .img-light { opacity: 0; } body.dark-mode .img-dark { opacity: 1; }
-        .reveal-layer .img-light { opacity: 0; } .reveal-layer .img-dark { opacity: 1; }
-        body.dark-mode .reveal-layer .img-light { opacity: 1; } body.dark-mode .reveal-layer .img-dark { opacity: 0; }
-
-        /* === Marquee Text === */
-        .scroll-text-wrapper { position: absolute; left: 0; width: 100%; overflow: hidden; pointer-events: none; z-index: 1; will-change: transform; }
-        .main-track-wrapper { top: 48%; height: 5.2rem; }
-        .sub-track-wrapper { top: 38%; height: 4.8rem; }
-        .scroll-text-track { position: absolute; top: 50%; left: 0; display: inline-flex; white-space: nowrap; font-family: var(--font-display); font-weight: 700; text-transform: uppercase; transform: translate3d(-50%, -50%, 0); will-change: transform; }
-        .scroll-text-item { display: inline-block; }
-        .scroll-text-track.main { font-size: 7rem; letter-spacing: 0.1em; animation: scrollRight 100s linear infinite; }
-        .scroll-text-track.sub { font-size: 5.5rem; letter-spacing: 0.15em; animation: scrollLeft 140s linear infinite; }
-
-        .text-main-base { color: var(--text-main-light); }
-        .text-main-reveal { color: var(--text-main-dark); }
-        body.dark-mode .text-main-base { color: var(--text-main-dark); }
-        body.dark-mode .text-main-reveal { color: var(--text-main-light); }
-        .text-sub-base { color: var(--text-sub-light); }
-        .text-sub-reveal { color: var(--text-sub-dark); }
-        body.dark-mode .text-sub-base { color: var(--text-sub-light-alt); }
-        body.dark-mode .text-sub-reveal { color: var(--text-sub-dark-alt); }
-
-        @keyframes scrollRight { 0% { transform: translate3d(-50%, -50%, 0); } 100% { transform: translate3d(0, -50%, 0); } }
-        @keyframes scrollLeft { 0% { transform: translate3d(0, -50%, 0); } 100% { transform: translate3d(-50%, -50%, 0); } }
-
-        /* === Navigation & UI === */
-        .nav-container { position: absolute; top: var(--pad); left: var(--pad); right: var(--pad); display: flex; justify-content: space-between; font-size: 14px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; pointer-events: none; z-index: 200; }
-        .nav-base { color: var(--text-main-light); z-index: 3; }
-        .nav-reveal { color: var(--text-main-dark); z-index: 1; }
-        body.dark-mode .nav-base { color: var(--text-main-dark); }
-        body.dark-mode .nav-reveal { color: var(--text-main-light); }
-        nav > div { pointer-events: auto; }
-
-        /* === Theme Toggle Icons === */
-        #dark-mode-toggle { cursor: pointer; pointer-events: auto; display: flex; align-items: center; justify-content: center; width: var(--icon-size); height: var(--icon-size); }
-        .toggle-icon { position: relative; width: var(--icon-size); height: var(--icon-size); }
-        .toggle-icon svg { position: absolute; top: 0; left: 0; width: var(--icon-size); height: var(--icon-size); stroke: currentColor; transition: all 0.5s ease; }
-        .icon-moon { opacity: 1; transform: rotate(0) scale(1); }
-        .icon-sun { opacity: 0; transform: rotate(-90deg) scale(0.5); }
-        body.dark-mode .icon-moon { opacity: 0; transform: rotate(90deg) scale(0.5); }
-        body.dark-mode .icon-sun { opacity: 1; transform: rotate(0) scale(1); }
-
-        /* === macOS Dock === */
-        .dock { width: auto; height: 60px; border-radius: 16px; display: flex; justify-content: center; position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 1000; pointer-events: auto; }
-        .dock-container { padding: 3px 10px; width: auto; height: 100%; display: flex; align-items: center; justify-content: center; border-radius: 16px; background: rgba(83, 83, 83, 0.25); backdrop-filter: blur(13px); -webkit-backdrop-filter: blur(13px); border: 1px solid rgba(255, 255, 255, 0.18); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
-        .dock-container li { list-style: none; display: flex; align-items: center; justify-content: center; width: 50px; height: 50px; vertical-align: bottom; transition: 0.2s; transform-origin: 50% 100%; position: relative; cursor: pointer; }
-        .dock-container li:hover { margin: 0px 13px 0px 13px; }
-        .dock-container li .name { position: absolute; top: -55px; background: rgba(0, 0, 0, 0.5); color: rgba(255, 255, 255, 0.9); height: auto; padding: 6px 12px; display: flex; align-items: center; justify-content: center; border-radius: 5px; visibility: hidden; font-family: var(--font-apple); font-size: 13px; font-weight: 500; letter-spacing: 0.5px; white-space: nowrap; }
-        .dock-container li .name::after { content: ""; position: absolute; bottom: -8px; width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent; border-top: 8px solid rgba(0, 0, 0, 0.5); }
-        .dock-container li:hover .name { visibility: visible; }
-        .dock-container li .ico { width: 100%; height: 100%; object-fit: cover; display: inline-block; transition: transform 0.3s ease; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3)); }
-        
-        .dock-container .li-active::after { position: absolute; width: 4px; height: 4px; border-radius: 50%; background: rgba(255, 255, 255, 0.8); content: ""; bottom: -2px; }
-
-        /* === macOS Application Window (Liquid Glass Portfolio App) === */
-        .mac-window {
             position: fixed;
-            background: rgba(250, 250, 250, 0.85);
-            backdrop-filter: blur(30px) saturate(150%);
-            -webkit-backdrop-filter: blur(30px) saturate(150%);
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            border-radius: 14px;
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255,255,255,0.3) inset;
-            overflow: hidden; display: none; flex-direction: column;
-            pointer-events: none; z-index: 900;
-            font-family: var(--font-apple);
-            will-change: transform, opacity; /* Optimized for smooth animations */
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: var(--bg-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.6s ease-out;
         }
+
+        #preloader img {
+            width: 120px;
+            animation: pulse 1.5s infinite ease-in-out;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.95); opacity: 0.8; }
+            50% { transform: scale(1.05); opacity: 1; }
+            100% { transform: scale(0.95); opacity: 0.8; }
+        }
+
+        /* Scroll Animations */
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+
+        .animate-on-scroll.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Layout Utilities */
+        .px-4 { padding-left: 1.5rem; padding-right: 1.5rem; }
+        .mb-2 { margin-bottom: 0.5rem; }
+        .mb-4 { margin-bottom: 1rem; }
+        .mb-6 { margin-bottom: 1.5rem; }
+        .mb-8 { margin-bottom: 2.5rem; }
+        .mt-4 { margin-top: 1rem; }
         
-        body.dark-mode .mac-window {
-            background: rgba(30, 30, 30, 0.75);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255,255,255,0.05) inset;
+        .flex { display: flex; }
+        .flex-col { flex-direction: column; }
+        .justify-center { justify-content: center; }
+        .justify-between { justify-content: space-between; }
+        .items-center { align-items: center; }
+        .items-start { align-items: flex-start; }
+        .items-end { align-items: flex-end; }
+        .gap-2 { gap: 0.5rem; }
+        .gap-4 { gap: 1rem; }
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        .relative { position: relative; }
+        .w-full { width: 100%; }
+
+        /* Specific Section Adjustments */
+        .header-logo {
+            width: 120px;
+            margin: 1.5rem auto 2.5rem auto;
+            display: block;
         }
 
-        .mac-window.open { display: flex; pointer-events: auto; }
+        .hero-title {
+            font-size: clamp(6rem, 28vw, 8.5rem);
+            margin-top: -10px;
+            margin-bottom: 0;
+            padding-bottom: 0.1em; /* Prevent clipping */
+        }
 
-        /* Title Bar */
-        .title-bar {
-            height: 52px; display: flex; align-items: center; padding: 0 16px;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.1); cursor: grab;
-            background: rgba(255, 255, 255, 0.2);
+        .hero-image-container {
+            position: relative;
+            width: 100%;
+            height: 320px;
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        .dawson-bg {
+            position: absolute;
+            left: 0;
+            top: 20px;
+            width: 85%;
+            z-index: 1;
+        }
+
+        .max-hero {
+            position: absolute;
+            right: 0;
+            bottom: -10px;
+            height: 115%;
+            z-index: 2;
+        }
+
+        .why-section {
+            margin-top: 3rem;
+        }
+
+        .why-image-wrapper {
+            width: 50%;
             position: relative;
         }
-        .title-bar:active { cursor: grabbing; }
-        body.dark-mode .title-bar { border-bottom: 1px solid rgba(255, 255, 255, 0.1); background: rgba(0, 0, 0, 0.2); }
 
-        /* Expandable Traffic Lights */
-        .traffic-lights { 
-            display: flex; 
-            gap: 8px; 
-            align-items: center;
-            z-index: 10;
-        }
-        .traffic-light { 
-            width: 13px; 
-            height: 13px; 
-            border-radius: 50%; 
-            cursor: pointer; 
-            border: 1px solid rgba(0,0,0,0.1); 
-            transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        .close { background: #ff5f57; } 
-        .minimize { background: #ffbd2e; } 
-        .maximize { background: #28ca42; }
-
-        .traffic-light:hover {
-            transform: scale(1.4);
+        .why-image {
+            width: 150%;
+            position: relative;
+            left: -25px;
+            top: -20px;
+            z-index: 2;
         }
 
-        .window-title { position: absolute; left: 50%; transform: translateX(-50%); font-size: 13px; font-weight: 600; color: #1d1d1f; }
-        body.dark-mode .window-title { color: #f5f5f7; }
-
-        /* App Content Area */
-        .content-area { flex: 1; display: flex; overflow: hidden; }
-
-        /* Sidebar */
-        .sidebar {
-            width: 260px; display: flex; flex-direction: column;
-            background: rgba(0, 0, 0, 0.03); border-right: 1px solid rgba(0, 0, 0, 0.1);
+        .why-text-wrapper {
+            width: 50%;
+            padding-top: 20px;
+            position: relative;
+            z-index: 3;
         }
-        body.dark-mode .sidebar { background: rgba(255, 255, 255, 0.02); border-right: 1px solid rgba(255, 255, 255, 0.1); }
-        
-        .notes-list { flex: 1; overflow-y: auto; padding: 10px; }
-        .notes-list::-webkit-scrollbar { display: none; }
 
-        .note-item {
-            padding: 12px 16px; margin-bottom: 5px; border-radius: 8px;
-            cursor: pointer; transition: all 0.2s ease;
+        .thats-where-container {
+            margin-top: 3rem;
         }
-        .note-item:hover { background: rgba(0, 0, 0, 0.05); }
-        body.dark-mode .note-item:hover { background: rgba(255, 255, 255, 0.05); }
-        
-        .note-item.active { background: #ffca22; color: #000; box-shadow: 0 2px 5px rgba(255, 202, 34, 0.4); }
-        
-        .note-title { font-size: 14px; font-weight: 700; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #1d1d1f; }
-        body.dark-mode .note-title { color: #fff; }
-        .note-item.active .note-title { color: #000; }
 
-        .note-preview { font-size: 12px; color: #8e8e93; line-height: 1.3; height: 32px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-        .note-item.active .note-preview { color: rgba(0, 0, 0, 0.7); }
-        
-        .note-date { font-size: 11px; color: #8e8e93; margin-top: 6px; font-weight: 500;}
-        .note-item.active .note-date { color: rgba(0, 0, 0, 0.6); }
+        .circle-max {
+            width: 75%;
+            margin: -25px auto -35px auto;
+            display: block;
+            position: relative;
+            z-index: 2;
+        }
 
-        /* Main View */
-        .note-view { flex: 1; display: flex; flex-direction: column; background: transparent; padding: 30px 40px; overflow-y: auto; }
-        .note-view::-webkit-scrollbar { width: 6px; }
-        .note-view::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.2); border-radius: 10px; }
-        body.dark-mode .note-view::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); }
+        .about-me-grid {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 1rem;
+        }
 
-        .note-view-title { font-size: 28px; font-weight: 800; color: #1d1d1f; margin-bottom: 5px; letter-spacing: -0.5px; }
-        body.dark-mode .note-view-title { color: #f5f5f7; }
-        
-        .note-view-meta { font-size: 13px; color: #8e8e93; margin-bottom: 30px; font-weight: 500; }
-        
-        .note-view-content { font-size: 15px; line-height: 1.6; color: #333; padding-bottom: 40px;}
-        body.dark-mode .note-view-content { color: #ddd; }
-        
-        .note-view-content p { margin-bottom: 16px; }
-        .note-view-content strong { font-weight: 600; color: #000; }
-        body.dark-mode .note-view-content strong { color: #fff; }
+        .about-col-left {
+            width: 48%;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
 
-        /* Custom Resize Handle */
-        .resize-handle {
+        .about-col-right {
+            width: 48%;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            padding-top: 2.5rem;
+        }
+
+        .niche-reels-container {
+            position: relative;
+            margin-top: 0.5rem;
+        }
+        
+        .arrow-img {
             position: absolute;
-            bottom: 0;
-            right: 0;
-            width: 20px;
-            height: 20px;
-            cursor: nwse-resize;
-            z-index: 1000;
+            width: 45px;
+            left: -25px;
+            top: 15px;
+            transform: rotate(-10deg);
         }
 
-        /* Content Image Styling */
-        .note-view-content img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 8px;
-            margin: 16px 0;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        .skew-italic {
+            transform: skewX(-12deg);
+            display: inline-block;
         }
-        body.dark-mode .note-view-content img {
-            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-        }
-        .image-grid {
-            display: flex; gap: 12px; margin: 16px 0;
-        }
-        .image-grid img {
-            width: calc(50% - 6px);
-            margin: 0;
-            object-fit: cover;
-        }
-        
-        /* === Perfect Fluid Screen Sizing & Layout Constraints (Mobile Optimization Rework) === */
-        @media (max-width: 768px) {
-            .content-area {
-                flex-direction: column;
-            }
-            .sidebar { 
-                width: 100% !important; 
-                height: 160px !important; 
-                border-right: none !important; 
-                border-bottom: 1px solid rgba(0,0,0,0.1) !important; 
-            }
-            body.dark-mode .sidebar { 
-                border-bottom: 1px solid rgba(255,255,255,0.1) !important; 
-            }
-            .notes-list { 
-                display: flex !important; 
-                flex-direction: row !important; 
-                gap: 12px !important; 
-                overflow-x: auto !important; 
-                overflow-y: hidden !important; 
-                padding: 12px !important; 
-                align-items: center;
-            }
-            .note-item { 
-                min-width: 170px !important; 
-                height: 110px !important;
-                margin-bottom: 0 !important; 
-                flex-shrink: 0 !important;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-            }
-            .note-preview {
-                height: 16px !important;
-                -webkit-line-clamp: 1 !important;
-            }
-            .note-view { 
-                height: calc(100% - 160px) !important; 
-                padding: 24px 20px !important; 
-            }
-            .note-view-title { font-size: 22px !important; }
-            .image-grid { flex-direction: column; }
-            .image-grid img { width: 100%; }
-        }
-
     </style>
-    
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org/",
-        "@type": "Person",
-        "name": "Max Tianyu Wang",
-        "url": "https://mtyw.ca",
-        "image": "https://mtyw.ca/IMG_0336.PNG",
-        "jobTitle": "Student & Creator",
-        "sameAs": [
-            "https://github.com/capybaramiata",
-            "https://linkedin.com/in/maxtianyuwang"
-        ]
-    }
-    </script>
 </head>
 <body>
 
-    <!-- PRELOADER -->
+    <!-- Preloader -->
     <div id="preloader">
-        <img src="logo.gif" alt="Max Tianyu Wang portfolio loading animation">
+        <img src="mtywLogo.webp" alt="Loading...">
     </div>
 
-    <div class="reveal-container">
+    <!-- Main Application Container -->
+    <div class="app-container">
         
-        <!-- BASE LAYER -->
-        <div class="layer base-layer">
-            <img src="IMG_0337.PNG" alt="Background" class="layer-img bg">
+        <!-- Header -->
+        <header class="animate-on-scroll">
+            <img src="mtywLogo.webp" alt="MTYW Logo" class="header-logo">
+        </header>
+
+        <!-- Intro Section -->
+        <section class="px-4 mb-4 animate-on-scroll">
+            <p class="font-roboto text-magenta" style="font-size: 1.5rem; padding-bottom: 0.2em;">Hi, my name is</p>
+            <h1 class="font-anton text-purple hero-title">MAX</h1>
+        </section>
+
+        <!-- Hero Images -->
+        <section class="hero-image-container animate-on-scroll">
+            <img src="dawsonBG.webp" alt="Dawson College" class="dawson-bg">
+            <img src="maxOne.webp" alt="Max Tianyu Wang" class="max-hero">
+        </section>
+
+        <!-- Running For -->
+        <section class="px-4 mb-8 animate-on-scroll">
+            <p class="font-roboto text-magenta" style="font-size: 1.8rem;">
+                And I'm running to<br>
+                be your next VP<br>
+                Communications<br>
+                for the DSU!
+            </p>
+        </section>
+
+        <!-- But Why Section -->
+        <section class="flex px-4 why-section mb-8 items-start animate-on-scroll">
+            <div class="why-image-wrapper">
+                <img src="maxTwo.webp" alt="Max Shrugging" class="why-image">
+            </div>
+            <div class="why-text-wrapper">
+                <h2 class="font-anton text-purple mb-2" style="font-size: 3.2rem;">BUT WHY?</h2>
+                <p class="font-roboto text-magenta mb-4" style="font-size: 1.25rem;">
+                    Dawson is an<br>
+                    amazing school<br>
+                    with toooons of<br>
+                    opportunity...
+                </p>
+                <img src="andThatsGreat.webp" alt="AND THAT'S GREAT!" style="width: 100%; max-width: 220px; display: block; margin-top: 1rem; transform: rotate(-6deg);">
+            </div>
+        </section>
+
+        <!-- The Catch Section -->
+        <section class="px-4 text-center mb-8 animate-on-scroll">
+            <h2 class="font-anton text-purple mb-4" style="font-size: 3.8rem; line-height: 0.95;">
+                ...SO WHAT'S<br>THE CATCH?
+            </h2>
+            <p class="font-roboto text-magenta mb-2" style="font-size: 1.4rem;">Right now, it feels</p>
+            <img src="impossible.webp" alt="IMPOSSIBLE" style="width: 85%; max-width: 320px; margin: 0 auto 1rem auto; display: block; transform: rotate(-4deg);">
+            <p class="font-roboto text-magenta mb-6" style="font-size: 1.4rem;">to actually find any of it.</p>
+            <p class="font-roboto text-magenta" style="font-size: 1.25rem; margin: 0 1rem;">
+                Discovering basic info<br>
+                on clubs and activities<br>
+                shouldn't feel like a<br>
+                scavenger hunt!
+            </p>
+        </section>
+
+        <!-- That's Where I'd Come In -->
+        <section class="px-4 thats-where-container mb-8 animate-on-scroll">
+            <h2 class="font-anton text-purple relative" style="font-size: 3.2rem; z-index: 3;">THAT'S WHERE</h2>
+            <img src="maxThree.webp" alt="Max Pointing to Self" class="circle-max">
+            <h2 class="font-anton text-purple text-right relative" style="font-size: 4.2rem; z-index: 3; margin-top: -10px;">I'D<br>COME IN.</h2>
+        </section>
+
+        <!-- About Me Section -->
+        <section class="px-4 mb-8">
+            <h2 class="font-anton text-purple mb-2 animate-on-scroll" style="font-size: 3.2rem; line-height: 0.95;">SOME<br>THINGS<br>ABOUT ME!</h2>
             
-            <div class="nav-container nav-base">
-                <div>Max Tianyu Wang</div>
-                <div id="dark-mode-toggle">
-                    <div class="toggle-icon">
-                        <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
-                        <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="scroll-text-wrapper sub-track-wrapper">
-                <div class="scroll-text-track sub text-sub-base">
-                    <span class="scroll-text-item">PHOTOGRAPHER · VIDEOGRAPHER · FILMMAKER · CREATOR · CAD DESIGNER · MUN PRESIDENT · PRIME MINISTER · PROGRAMMER · SPEAKER · LEADER · GRAPHIC DESIGNER · SKI INSTRUCTOR · ROBOTICS LEAD ·&nbsp;</span>
-                    <span class="scroll-text-item">PHOTOGRAPHER · VIDEOGRAPHER · FILMMAKER · CREATOR · CAD DESIGNER · MUN PRESIDENT · PRIME MINISTER · PROGRAMMER · SPEAKER · LEADER · GRAPHIC DESIGNER · SKI INSTRUCTOR · ROBOTICS LEAD ·&nbsp;</span>
-                </div>
-            </div>
-
-            <div class="scroll-text-wrapper main-track-wrapper">
-                <div class="scroll-text-track main text-main-base">
-                    <span class="scroll-text-item">MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;</span>
-                    <span class="scroll-text-item">MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;MAX TIANYU WANG&nbsp;</span>
-                </div>
-            </div>
-
-            <div class="subject-wrapper subject">
-                <img src="IMG_0336.PNG" alt="Max Tianyu Wang Light" class="subject-img img-light">
-                <img src="IMG_0335.PNG" alt="Max Tianyu Wang Dark" class="subject-img img-dark">
-            </div>
-        </div>
-
-        <!-- REVEAL LAYER -->
-        <svg class="layer reveal-layer" id="revealLayer" aria-hidden="true" width="100%" height="100%" preserveAspectRatio="none">
-            <defs>
-                <radialGradient id="soft-brush">
-                    <stop offset="15%" stop-color="white" stop-opacity="1" />
-                    <stop offset="45%" stop-color="white" stop-opacity="0.5" />
-                    <stop offset="80%" stop-color="white" stop-opacity="0" />
-                </radialGradient>
-                <mask id="cursor-mask" maskUnits="userSpaceOnUse" x="-50%" y="-50%" width="200%" height="200%">
-                    <rect width="100%" height="100%" fill="black" />
-                    <g id="mask-elements"></g>
-                </mask>
-            </defs>
-
-            <foreignObject width="100%" height="100%" mask="url(#cursor-mask)">
-                <div xmlns="http://www.w3.org/1999/xhtml" style="width: 100vw; height: 100vh; position: absolute; top: 0; left: 0;">
-                    <img src="IMG_0337.PNG" class="layer-img bg" alt="" />
-                    
-                    <div class="nav-container nav-reveal">
-                        <div>Max Tianyu Wang</div>
-                        <div class="theme-toggle-reveal" style="pointer-events: none;">
-                            <div class="toggle-icon">
-                                <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
-                                <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
-                            </div>
-                        </div>
+            <div class="about-me-grid">
+                <!-- Left Column -->
+                <div class="about-col-left">
+                    <div class="animate-on-scroll">
+                        <p class="font-roboto text-magenta mb-2" style="font-size: 1.05rem;">
+                            I've worked in<br>communications for a<br>robotics team for over 2<br>years.
+                        </p>
+                        <p class="font-roboto text-magenta mb-2" style="font-size: 0.8rem;">
+                            (and actually learned<br>how to make a website)
+                        </p>
+                        <img src="roboticsSite.webp" alt="Robotics Website" class="w-full" style="border-radius: 6px;">
                     </div>
                     
-                    <div class="scroll-text-wrapper sub-track-wrapper">
-                        <div class="scroll-text-track sub text-sub-reveal">
-                            <span class="scroll-text-item">PHOTOGRAPHER · VIDEOGRAPHER · FILMMAKER · CREATOR · CAD DESIGNER · MUN PRESIDENT · PRIME MINISTER · PROGRAMMER · SPEAKER · LEADER · GRAPHIC DESIGNER · SKI INSTRUCTOR · ROBOTICS LEAD ·&#160;</span>
-                            <span class="scroll-text-item">PHOTOGRAPHER · VIDEOGRAPHER · FILMMAKER · CREATOR · CAD DESIGNER · MUN PRESIDENT · PRIME MINISTER · PROGRAMMER · SPEAKER · LEADER · GRAPHIC DESIGNER · SKI INSTRUCTOR · ROBOTICS LEAD ·&#160;</span>
+                    <div class="animate-on-scroll">
+                        <p class="font-roboto text-magenta mb-2" style="font-size: 1.05rem;">
+                            I'm a photographer!<br>(shoutout<br><a href="https://instagram.com/pixwithmax" target="_blank" style="color: inherit; text-decoration: underline;">@pixwithmax</a>)
+                        </p>
+                        <img src="maxFour.webp" alt="Max with Camera" style="width: 70%; margin: 0 auto; display: block;">
+                    </div>
+                </div>
+
+                <!-- Right Column -->
+                <div class="about-col-right">
+                    <div class="animate-on-scroll">
+                        <p class="font-roboto text-magenta" style="font-size: 1.05rem;">
+                            I like to create niche<br>reels like these...
+                        </p>
+                        <div class="niche-reels-container">
+                            <img src="arrow.webp" alt="Arrow pointing" class="arrow-img">
+                            <img src="nicheReels.webp" alt="Niche Reels Example" style="width: 85%; margin-left: auto; display: block; border-radius: 6px;">
                         </div>
                     </div>
 
-                    <div class="scroll-text-wrapper main-track-wrapper">
-                        <div class="scroll-text-track main text-main-reveal">
-                            <span class="scroll-text-item">MAX TIANYU WANG&#160;MAX TIANYU WANG&#160;MAX TIANYU WANG&#160;MAX TIANYU WANG&#160;MAX TIANYU WANG&#160;MAX TIANYU WANG&#160;MAX TIANYU WANG&#160;MAX TIANYU WANG&#160;</span>
-                            <span class="scroll-text-item">MAX TIANYU WANG&#160;MAX TIANYU WANG&#160;MAX TIANYU WANG&#160;MAX TIANYU WANG&#160;MAX TIANYU WANG&#160;MAX TIANYU WANG&#160;MAX TIANYU WANG&#160;MAX TIANYU WANG&#160;</span>
-                        </div>
-                    </div>
-
-                    <div class="subject-wrapper subject">
-                        <img src="IMG_0336.PNG" class="subject-img img-light" alt="" />
-                        <img src="IMG_0335.PNG" class="subject-img img-dark" alt="" />
+                    <div class="animate-on-scroll">
+                        <p class="font-roboto text-magenta mb-2" style="font-size: 1.05rem;">
+                            I managed my<br>school's meme<br>account :D
+                        </p>
+                        <img src="softVemes.webp" alt="Meme Account" class="w-full" style="border-radius: 6px;">
+                        <p class="font-roboto text-magenta text-right mt-2" style="font-size: 0.7rem;">
+                            (Also I have canva premium...<br>subtle flex ;))
+                        </p>
                     </div>
                 </div>
-            </foreignObject>
-        </svg>
-
-    </div>
-
-    <!-- === MACOS DOCK === -->
-    <div class="dock">
-        <ul class="dock-container">
-            <li onclick="openApp(event, 'About')" class="app-icon">
-                <div class="name">About</div>
-                <img class="ico" src="https://uploads-ssl.webflow.com/5f7081c044fb7b3321ac260e/5f70853981255cc36b3a37af_finder.png" alt="About">
-            </li>
-            <li onclick="openApp(event, 'Photos')" class="app-icon">
-                <div class="name">Photos</div>
-                <img class="ico" src="https://uploads-ssl.webflow.com/5f7081c044fb7b3321ac260e/5f70853c55558a2e1192ee09_photos.png" alt="Photos">
-            </li>
-            <li onclick="openApp(event, 'Portfolio')" class="app-icon li-active" id="dock-notes">
-                <div class="name">Portfolio</div>
-                <img class="ico" src="https://uploads-ssl.webflow.com/5f7081c044fb7b3321ac260e/5f70853c849ec3735b52cef9_notes.png" alt="Portfolio">
-            </li>
-            <li onclick="openApp(event, 'Creations')" class="app-icon">
-                <div class="name">Creations</div>
-                <img class="ico" src="https://uploads-ssl.webflow.com/5f7081c044fb7b3321ac260e/5f70853270b5e2ccfd795b49_appstore.png" alt="Creations">
-            </li>
-            <li onclick="openApp(event, 'Socials')" class="app-icon">
-                <div class="name">Socials</div>
-                <img class="ico" src="https://uploads-ssl.webflow.com/5f7081c044fb7b3321ac260e/5f70853743597518c528b9b3_contacts.png" alt="Socials">
-            </li>
-        </ul>
-    </div>
-
-    <!-- === MACOS APP WINDOW === -->
-    <div id="mac-window" class="mac-window">
-        <div class="title-bar" id="window-drag-handle">
-            <div class="traffic-lights">
-                <div class="traffic-light close" onclick="closeApp(event)" title="Close"></div>
-                <div class="traffic-light minimize" onclick="closeApp(event)" title="Minimize"></div>
-                <div class="traffic-light maximize" onclick="toggleMaximize(event)" title="Full Screen"></div>
             </div>
-            <div class="window-title" id="window-title">Portfolio</div>
-        </div>
+        </section>
 
-        <div class="content-area">
-            <div class="sidebar">
-                <div class="notes-list" id="notesList">
-                    <!-- Dynamic Notes Loaded Here -->
+        <!-- My Plans Section -->
+        <section class="px-4 mb-8">
+            <h2 class="font-anton text-purple mb-6 animate-on-scroll" style="font-size: 3.5rem;">MY PLANS?</h2>
+
+            <div class="flex items-center gap-4 mb-6 animate-on-scroll">
+                <img src="laptop.webp" alt="Laptop Icon" style="width: 90px; object-fit: contain;">
+                <p class="font-roboto text-magenta" style="font-size: 1.15rem;">
+                    I'll maintain a properly<br>
+                    updated website with all the<br>
+                    clubs and activities LIVE
+                </p>
+            </div>
+
+            <div class="flex items-center gap-4 mb-6 animate-on-scroll">
+                <p class="font-roboto text-magenta text-right" style="flex: 1; font-size: 1.15rem;">
+                    Also, weekly reels that<br>
+                    ppl will actually watch!
+                </p>
+                <img src="scrollReels.webp" alt="Scrolling Reels" style="width: 90px; border-radius: 50%; object-fit: cover;">
+            </div>
+
+            <div class="flex items-center gap-4 mb-8 animate-on-scroll">
+                <img src="updateBell.webp" alt="Notification Bell" style="width: 70px; margin-left: 10px; object-fit: contain;">
+                <p class="font-roboto text-magenta" style="font-size: 1.15rem;">
+                    Updates that<br>
+                    aren't just a single<br>
+                    insta story.
+                </p>
+            </div>
+        </section>
+
+        <!-- Interested / CTA Section -->
+        <section class="px-4 text-center mt-4 pb-8 animate-on-scroll">
+            <img src="interested.webp" alt="INTERESTED?" style="width: 85%; max-width: 300px; margin: 0 auto 1rem auto; display: block;">
+            <p class="font-roboto text-purple mb-6" style="font-size: 1.3rem;">Check out my stuff!</p>
+
+            <div class="flex justify-center items-end gap-2">
+                <div class="flex flex-col items-center" style="width: 32%;">
+                    <a href="https://instagram.com/max4vpcomms" target="_blank" style="text-decoration: none; display: flex; flex-direction: column; align-items: center;">
+                        <img src="instaLogo.webp" alt="Instagram Logo" style="width: 65px; margin-bottom: 5px;">
+                        <p class="font-roboto text-magenta" style="font-size: 0.75rem;">@max4vpcomms</p>
+                    </a>
+                </div>
+                <div class="flex flex-col items-center" style="width: 32%;">
+                    <a href="https://instagram.com/mtyw.ca" target="_blank" style="text-decoration: none; display: flex; flex-direction: column; align-items: center;">
+                        <img src="instaLogo.webp" alt="Instagram Logo" style="width: 65px; margin-bottom: 5px;">
+                        <p class="font-roboto text-magenta" style="font-size: 0.75rem;">@mtyw.ca</p>
+                    </a>
+                </div>
+                <div class="flex flex-col items-center mb-1" style="width: 32%;">
+                    <img src="portfolioComing.webp" alt="Portfolio Coming Soon" style="width: 100%; max-width: 90px;">
                 </div>
             </div>
+        </section>
 
-            <div class="note-view">
-                <div class="note-view-title" id="noteTitle">Select a note</div>
-                <div class="note-view-meta" id="noteMeta"></div>
-                <div class="note-view-content" id="noteContent"></div>
-            </div>
-        </div>
-        
-        <!-- Resize handle for the window -->
-        <div class="resize-handle" id="window-resize-handle"></div>
     </div>
 
+    <!-- Interactions & Logic -->
     <script>
-        // === App Data & Logic ===
-        const portfolioNotes = [
-            {
-                id: 1, 
-                title: "Sculpture molle", 
-                date: "Projet arts plastiques 1",
-                preview: "Pour ce projet de sculpture molle, l'objectif était de créer un visage déformé...",
-                content: `
-                    <img src="DSC06592.webp" alt="Sculpture molle finale">
-                    <p>Pour ce projet de sculpture molle, l'objectif était de créer un visage déformé aux allures de monstre, basé sur le surréalisme. Après avoir testé la couture à la main et le feutrage à l'aiguille, j'ai choisi de travailler avec le feutrage. Pour concevoir le visuel, j'ai superposé et tracé deux photos de mon propre visage afin d'obtenir un portrait transformé. J'ai ensuite appliqué les techniques apprises lors des exercices pour donner du volume à ce dessin et réaliser la sculpture finale.</p>
-                    <img src="IMG_0279.webp" alt="Processus de croquis">
-                    <p>Je suis particulièrement fier du mélange des deux visages dans le croquis initial et de la transition vers la sculpture. J'ai réussi à donner un bel effet de profondeur en 3D à la sculpture, ce qui rend le visage très expressif.</p>
-                    <p>Le principal défi a été de donner une belle forme à la sculpture, notamment parce que la mousse utilisée à l'intérieur comme base était très solide et difficile à modeler. Pour résoudre ce problème, j'ai procédé par étapes : j'ai d'abord assemblé les deux parties principales de mon mélange de visages, puis j'ai ajouté un à un les éléments comme les cheveux, les oreilles, le nez et les yeux pour bâtir les volumes.</p>
-                    <p>Si j'avais eu plus de temps, j'aurais ajouté plus de détails et d'éléments complexes à la sculpture. J'aurais notamment aimé intégrer des accessoires, comme mes lunettes, pour accentuer le contraste entre le réalisme et la déformation.</p>
-                `
-            },
-            {
-                id: 2, 
-                title: "Les mains en action", 
-                date: "Projet arts plastiques 2",
-                preview: "Pour ce projet, l'objectif était de représenter des mains accomplissant un geste précis...",
-                content: `
-                    <img src="IMG_0372.webp" alt="Dessin numérique des mains en action">
-                    <p>Pour ce projet, l'objectif était de représenter des mains accomplissant un geste précis lié à un rituel ou une tradition. J'ai choisi d'illustrer une action issue de ma propre routine et tradition au sein de mon équipe de robotique: le travail mécanique. Mon dessin numérique montre des mains en pleine action, coupant en deux un support de montage en aluminium (1201 Series Quad Block Pattern Mount) pour l'adapter aux besoins du robot.</p>
-                    <div class="image-grid">
-                        <img src="IMG_0323.webp" alt="Image de référence 1">
-                        <img src="IMG_0344.webp" alt="Image de référence 2">
-                    </div>
-                    <p>Je suis particulièrement fier de la perspective et du réalisme des mains en position de force pendant la coupe. J’ai réussi à bien capturer l'alignement des doigts et la texture métallique de la pièce de robotique, ce qui rend le geste technique très crédible.</p>
-                    <img src="DSC08683.webp" alt="Détail du travail de texture et d'ombrage">
-                    <p>Le principal défi a été de bien représenter les ombres et les lumières sur la peau pour donner du relief aux mains en action. J'ai résolu ce problème en observant attentivement mes photos de référence pour placer les contrastes de manière plus précise et naturelle.</p>
-                    <p>Si j'avais eu plus de temps, j'aurais rendu les lignes plus nettes, car l'utilisation excessive de l'outil de mélange (blend) a rendu le dessin un peu trop flou. J'aurais aussi ajouté un arrière-plan plus représentatif de l'atelier de robotique pour mieux situer l'action.</p>
-                `
-            },
-            {
-                id: 3, 
-                title: "Adobe Illustrator", 
-                date: "Projet de design graphique 1",
-                preview: "Ce projet avait pour but de découvrir Adobe Illustrator et ses fonctionnalités...",
-                content: `
-                    <p>Ce projet avait pour but de découvrir Adobe Illustrator et ses fonctionnalités en concevant 4 mini projets.</p>
-                    <div class="image-grid">
-                        <img src="monstre.webp" alt="Projet Monstre">
-                        <img src="coeur.webp" alt="Projet Coeur">
-                    </div>
-                    <div class="image-grid">
-                        <img src="Inspo.webp" alt="Inspiration">
-                        <img src="Max_Verstappen.webp" alt="Max Verstappen">
-                    </div>
-                    <div class="image-grid">
-                        <img src="IMG_0241.webp" alt="Image de référence">
-                        <img src="G_Max.webp" alt="Lettre G Max">
-                    </div>
-                    <p>J’étais fier de comment j’ai pu finir d'apprendre un nouveau moyen de créer des graphiques, même si je n’ai pas encore maîtrisé l’outil.</p>
-                    <p>Toutefois, j’avais de la difficulté à utiliser certains outils et j’avais de la trouble avec les modes de fusion, comme multiply, pour l'Abécédaire. J’ai dû regarder quelques guides en ligne afin de mieux comprendre comment avoir le résultat que je désire.</p>
-                    <p>Si j’avais eu plus de temps, je ferais plus d’attention à l’arrière-plan. Dans tous mes projets, j’ai gardé l’arrière-plan plutôt simple ce qui peut être amélioré avec des motifs ou des textures.</p>
-                `
-            },
-            {
-                id: 4, 
-                title: "Boîte de céréales", 
-                date: "Projet de design graphique 2",
-                preview: "Ce projet avait pour but de créer une boîte de céréales visée aux enfants.",
-                content: `
-                    <img src="displayJ.webp" alt="Boîte de céréales finale">
-                    <p>Ce projet avait pour but de créer une boîte de céréales visée aux enfants.</p>
-                    <img src="chevealFinal.jpg" alt="Logo et mascotte">
-                    <p>Je suis particulièrement fier du logo (wordmark) de la marque « Che-véal ! ». La police de caractère unique, enrichie par l'ajout de deux triangles et d'un dégradé bleu-violet, crée un impact visuel fort et dynamique. Je suis aussi très satisfait de la mascotte cartoon, Jameson. C’était la première fois que je dessinais un personnage en couleur dans ce style, et je trouve le résultat particulièrement mignon et réussi.</p>
-                    <img src="draftJ.webp" alt="Recherches et croquis">
-                    <p>Le principal défi a été de trouver une bonne composition pour la face avant qui mette le bol de céréales en valeur. Dans mon design initial, la mascotte prenait trop de place, ce qui laissait peu de visibilité au produit lui-même. Pour résoudre ce problème, je me suis inspiré des boîtes de céréales de mon enfance, qui présentaient le bol dans un environnement authentique plutôt que dans un studio photo figé, souvent sous forme de plan complet et texturé. J'ai donc superposé une photo du bol sur un gros plan en vue plongeante des céréales pour créer un motif de fond, le tout lié par un dégradé linéaire pour harmoniser l'ensemble.</p>
-                    <div class="image-grid">
-                        <img src="drafts.webp" alt="Brouillons 1">
-                        <img src="cereal.webp" alt="Brouillons 2">
-                    </div>
-                    <p>Si j'avais eu plus de temps, j'aurais dessiné plusieurs variantes et poses de la mascotte Jameson afin de pouvoir les intégrer à différents endroits sur les côtés et à l'arrière de la boîte, rendant l'emballage encore plus interactif et amusant.</p>
-                `
-            },
-            {
-                id: 5, 
-                title: "Projets supplémentaires", 
-                date: ":)",
-                preview: "Couverture de magazine parodique, couvertures d'album, et revue de mode...",
-                content: `
-                    <img src="HORSE.png" alt="Couverture de magazine parodique">
-                    <p>Couverture de magazine parodique (23)</p>
-                    
-                    <div class="image-grid">
-                        <img src="4.png" alt="Couverture d'album 4">
-                        <img src="5.png" alt="Couverture d'album 5">
-                    </div>
-                    <div class="image-grid">
-                        <img src="2.png" alt="Couverture d'album 2">
-                        <img src="3.png" alt="Couverture d'album 3">
-                    </div>
-                    <p>Couvertures d'album (9)</p>
-                    
-                    <img src="maxMagazine.png" alt="Couverture de revue de mode">
-                    <p>Couverture de revue de mode (5)</p>
-                    
-                    <div class="image-grid">
-                        <img src="sup1.png" alt="Dessin supplémentaire 1">
-                        <img src="sup2.png" alt="Dessin supplémentaire 2">
-                    </div>
-                    <p>Travaux supplémentaires arts plastiques</p>
-                `
-            }
-        ];
-
-        let currentNoteId = 1;
-
-        function renderNotes() {
-            const list = document.getElementById("notesList");
-            list.innerHTML = "";
-            portfolioNotes.forEach(note => {
-                const el = document.createElement("div");
-                el.className = `note-item ${note.id === currentNoteId ? "active" : ""}`;
-                el.onclick = () => selectNote(note.id);
-                el.innerHTML = `
-                    <div class="note-title">${note.title}</div>
-                    <div class="note-preview">${note.preview}</div>
-                    <div class="note-date">${note.date}</div>
-                `;
-                list.appendChild(el);
-            });
-        }
-
-        function selectNote(id) {
-            currentNoteId = id;
-            const note = portfolioNotes.find(n => n.id === id);
-            if (note) {
-                document.getElementById("noteTitle").textContent = note.title;
-                document.getElementById("noteMeta").textContent = note.date;
-                document.getElementById("noteContent").innerHTML = note.content;
-            }
-            renderNotes();
-        }
-
-        renderNotes();
-        selectNote(1);
-
-        // === Window Animation & Drag Logic ===
-        let lastOriginRect = null;
-        let isMaximized = false;
-        let preMaxState = { top: 0, left: 0, width: 0, height: 0 };
-        const win = document.getElementById('mac-window');
-
-        window.openApp = function(event, appName) {
-            event.stopPropagation();
-            
-            if (appName === 'Socials') {
-                window.open('https://instagram.com/mtyw.ca', '_blank');
-                return;
-            }
-            
-            if (appName !== 'Portfolio') {
-                return;
-            }
-            
-            const icon = event.currentTarget;
-            lastOriginRect = icon.getBoundingClientRect();
-            
-            document.getElementById('window-title').innerText = appName;
-            
-            // 1. Calculate final dimensions
-            let targetWidth = window.innerWidth * 0.6;
-            let targetHeight = window.innerHeight * 0.6;
-            if(window.innerWidth < 768) {
-                 targetWidth = window.innerWidth * 0.9;
-                 targetHeight = window.innerHeight * 0.8;
-            }
-            let targetLeft = (window.innerWidth - targetWidth) / 2;
-            let targetTop = (window.innerHeight - targetHeight) / 2;
-
-            // 2. Set dimensions immediately (No transition to prevent layout lag)
-            win.style.transition = 'none';
-            win.style.width = `${targetWidth}px`;
-            win.style.height = `${targetHeight}px`;
-            win.style.left = `${targetLeft}px`;
-            win.style.top = `${targetTop}px`;
-            
-            // 3. Calculate start transform (from icon position)
-            let targetCx = targetLeft + targetWidth / 2;
-            let targetCy = targetTop + targetHeight / 2;
-            let iconCx = lastOriginRect.left + lastOriginRect.width / 2;
-            let iconCy = lastOriginRect.top + lastOriginRect.height / 2;
-            
-            let tx = iconCx - targetCx;
-            let ty = iconCy - targetCy;
-            
-            // Apply start state
-            win.style.transform = `translate(${tx}px, ${ty}px) scale(0.05)`;
-            win.style.opacity = '0';
-            win.classList.add('open');
-            
-            void win.offsetWidth; // Force reflow
-            
-            // 4. Animate ONLY transform and opacity (GPU accelerated)
-            win.style.transition = 'transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1), opacity 0.3s ease-out';
-            win.style.transform = `translate(0px, 0px) scale(1)`;
-            win.style.opacity = '1';
-            
-            isMaximized = false;
-        };
-
-        window.closeApp = function(event) {
-            if(event) event.stopPropagation();
-            
-            win.style.transition = 'transform 0.35s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.25s ease-in';
-            
-            if(lastOriginRect) {
-                let rect = win.getBoundingClientRect();
-                let targetCx = rect.left + rect.width / 2;
-                let targetCy = rect.top + rect.height / 2;
-                
-                let iconCx = lastOriginRect.left + lastOriginRect.width / 2;
-                let iconCy = lastOriginRect.top + lastOriginRect.height / 2;
-                
-                let tx = iconCx - targetCx;
-                let ty = iconCy - targetCy;
-                
-                win.style.transform = `translate(${tx}px, ${ty}px) scale(0.05)`;
-            } else {
-                win.style.transform = `translate(0px, 100px) scale(0.5)`;
-            }
-            win.style.opacity = '0';
-            
-            setTimeout(() => {
-                win.classList.remove('open');
-                win.style.transform = 'none'; // Reset
-            }, 350);
-        };
-
-        window.toggleMaximize = function(event) {
-            event.stopPropagation();
-            // Only transition dimensions/positions for maximize
-            win.style.transition = 'top 0.4s ease, left 0.4s ease, width 0.4s ease, height 0.4s ease';
-            if(!isMaximized) {
-                preMaxState = { top: win.style.top, left: win.style.left, width: win.style.width, height: win.style.height };
-                win.style.top = '20px';
-                win.style.left = '20px';
-                win.style.width = `calc(100vw - 40px)`;
-                win.style.height = `calc(100vh - 120px)`; 
-                isMaximized = true;
-            } else {
-                win.style.top = preMaxState.top;
-                win.style.left = preMaxState.left;
-                win.style.width = preMaxState.width;
-                win.style.height = preMaxState.height;
-                isMaximized = false;
-            }
-        };
-
-        // Make window draggable
-        const dragHandle = document.getElementById('window-drag-handle');
-        let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-
-        dragHandle.onmousedown = dragMouseDown;
-        dragHandle.ontouchstart = dragTouchStart;
-
-        function dragMouseDown(e) {
-            if(isMaximized || e.target.classList.contains('traffic-light')) return;
-            e.preventDefault();
-            pos3 = e.clientX; pos4 = e.clientY;
-            document.onmouseup = closeDragElement;
-            document.onmousemove = elementDrag;
-        }
-
-        function dragTouchStart(e) {
-            if(isMaximized || e.target.classList.contains('traffic-light')) return;
-            pos3 = e.touches[0].clientX; pos4 = e.touches[0].clientY;
-            document.ontouchend = closeDragElement;
-            document.ontouchmove = elementDragTouch;
-        }
-
-        function elementDrag(e) {
-            e.preventDefault();
-            pos1 = pos3 - e.clientX; pos2 = pos4 - e.clientY;
-            pos3 = e.clientX; pos4 = e.clientY;
-            win.style.transition = 'none'; 
-            win.style.top = (win.offsetTop - pos2) + "px";
-            win.style.left = (win.offsetLeft - pos1) + "px";
-        }
-
-        function elementDragTouch(e) {
-            pos1 = pos3 - e.touches[0].clientX; pos2 = pos4 - e.touches[0].clientY;
-            pos3 = e.touches[0].clientX; pos4 = e.touches[0].clientY;
-            win.style.transition = 'none';
-            win.style.top = (win.offsetTop - pos2) + "px";
-            win.style.left = (win.offsetLeft - pos1) + "px";
-        }
-
-        function closeDragElement() {
-            document.onmouseup = null; document.onmousemove = null;
-            document.ontouchend = null; document.ontouchmove = null;
-            win.style.transition = 'none'; // Ensure no laggy layout transitions persist
-        }
-
-        // === Custom Resize Logic ===
-        const resizeHandleObj = document.getElementById('window-resize-handle');
-        let isResizing = false;
-        let startX, startY, startWidth, startHeight;
-
-        resizeHandleObj.addEventListener('mousedown', function(e) {
-            if(isMaximized) return; // Prevent resize when maximized
-            e.preventDefault();
-            e.stopPropagation();
-            isResizing = true;
-            startX = e.clientX;
-            startY = e.clientY;
-            startWidth = win.offsetWidth;
-            startHeight = win.offsetHeight;
-            
-            win.style.transition = 'none';
-            
-            document.addEventListener('mousemove', doResize);
-            document.addEventListener('mouseup', stopResize);
-        });
-
-        resizeHandleObj.addEventListener('touchstart', function(e) {
-            if(isMaximized) return; 
-            e.stopPropagation();
-            isResizing = true;
-            startX = e.touches[0].clientX;
-            startY = e.touches[0].clientY;
-            startWidth = win.offsetWidth;
-            startHeight = win.offsetHeight;
-            
-            win.style.transition = 'none';
-            
-            document.addEventListener('touchmove', doResizeTouch, {passive: false});
-            document.addEventListener('touchend', stopResizeTouch);
-        });
-
-        function doResize(e) {
-            if(!isResizing) return;
-            requestAnimationFrame(() => {
-                let newWidth = Math.max(startWidth + (e.clientX - startX), 320);
-                let newHeight = Math.max(startHeight + (e.clientY - startY), 240);
-                win.style.width = newWidth + 'px';
-                win.style.height = newHeight + 'px';
-            });
-        }
-
-        function stopResize(e) {
-            isResizing = false;
-            document.removeEventListener('mousemove', doResize);
-            document.removeEventListener('mouseup', stopResize);
-        }
-
-        function doResizeTouch(e) {
-            if(!isResizing) return;
-            e.preventDefault();
-            requestAnimationFrame(() => {
-                let newWidth = Math.max(startWidth + (e.touches[0].clientX - startX), 320);
-                let newHeight = Math.max(startHeight + (e.touches[0].clientY - startY), 240);
-                win.style.width = newWidth + 'px';
-                win.style.height = newHeight + 'px';
-            });
-        }
-
-        function stopResizeTouch(e) {
-            isResizing = false;
-            document.removeEventListener('touchmove', doResizeTouch);
-            document.removeEventListener('touchend', stopResizeTouch);
-        }
-
-        // === Dock Icon Hover Animation ===
-        const icons = document.querySelectorAll(".ico");
-        const resetIcons = () => icons.forEach(item => item.style.transform = "scale(1) translateY(0px)");
-
-        icons.forEach((item, index) => {
-            item.addEventListener("mouseover", () => {
-                resetIcons();
-                const transformations = [
-                    { idx: index - 2, scale: 1.1, translateY: 0 },
-                    { idx: index - 1, scale: 1.2, translateY: -6 },
-                    { idx: index, scale: 1.5, translateY: -10 },
-                    { idx: index + 1, scale: 1.2, translateY: -6 },
-                    { idx: index + 2, scale: 1.1, translateY: 0 }
-                ];
-                transformations.forEach(({ idx, scale, translateY }) => {
-                    if (icons[idx]) icons[idx].style.transform = `scale(${scale}) translateY(${translateY}px)`;
-                });
-            });
-            item.addEventListener("mouseleave", resetIcons);
-        });
-
-        // === Hero Animation Protocol ===
-        document.addEventListener("DOMContentLoaded", () => {
-            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 768;
-            const isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
-
-            const MAIN_RADIUS = isMobile ? 60 : 100;
-            const TRAIL_LENGTH = isFirefox ? 25 : 60; 
-            const LAG_FACTOR = 0.15;
-            
-            let targetX = window.innerWidth / 2;
-            let targetY = window.innerHeight / 2;
-            let currentX = targetX, currentY = targetY;
-            let time = 0, isAnimating = false, mouseActive = false;
-            let maskFadeMultiplier = 0, isIdleSwirling = false, idleTime = 0;
-            let centerX = window.innerWidth / 2, centerY = window.innerHeight / 2;
-
-            const bgs = document.querySelectorAll('.bg');
-            const subjects = document.querySelectorAll('.subject-wrapper');
-            const scrollWrappers = document.querySelectorAll('.scroll-text-wrapper');
-            
-            let paraTargetX = 0, paraTargetY = 0;
-            let paraCurrentX = 0, paraCurrentY = 0;
-
-            window.addEventListener('resize', () => { centerX = window.innerWidth / 2; centerY = window.innerHeight / 2; });
-
-            let mouseTimeout, idleTimer;
-            const setMouseActiveState = () => {
-                mouseActive = true;
-                clearTimeout(mouseTimeout);
-                mouseTimeout = setTimeout(() => mouseActive = false, 300);
-                clearTimeout(idleTimer);
-                idleTimer = setTimeout(() => { isIdleSwirling = true; idleTime = 0; }, 3000);
-            };
-
-            const updateTarget = (x, y) => {
-                targetX = x; targetY = y;
-                if (isIdleSwirling) { isIdleSwirling = false; currentX = targetX; currentY = targetY; }
-                paraTargetX = (x - centerX) / centerX;
-                paraTargetY = (y - centerY) / centerY;
-                setMouseActiveState();
-            };
-
-            window.addEventListener("mousemove", (e) => updateTarget(e.clientX, e.clientY));
-            window.addEventListener("touchmove", (e) => updateTarget(e.touches[0].clientX, e.touches[0].clientY), { passive: true });
-
-            // Theme Toggle
-            let isDarkMode = false;
-            const toggle = document.getElementById("dark-mode-toggle");
-            toggle.addEventListener("click", () => {
-                isDarkMode = !isDarkMode;
-                document.body.classList.toggle('dark-mode', isDarkMode);
-            });
-
-            // SVG Mask Initialization
-            const maskGroup = document.getElementById('mask-elements');
-            const maskCircles = [];
-            const SVG_NS = "http://www.w3.org/2000/svg";
-            
-            for (let i = 0; i < TRAIL_LENGTH; i++) {
-                const circle = document.createElementNS(SVG_NS, "circle");
-                circle.setAttribute('fill', 'url(#soft-brush)');
-                circle.setAttribute('r', '0');
-                maskGroup.appendChild(circle);
-                maskCircles.push(circle);
-            }
-
-            const trail = [];
-            const lerp = (start, end, factor) => start + (end - start) * factor;
-
-            const startTime = Date.now();
-            window.addEventListener("load", () => {
-                const elapsed = Date.now() - startTime;
-                const remaining = Math.max(0, 3200 - elapsed); 
+        // Handle Preloader Removal
+        window.addEventListener('load', () => {
+            const preloader = document.getElementById('preloader');
+            if (preloader) {
+                // Ensure a minimum display time for smooth visual flow
                 setTimeout(() => {
-                    const preloader = document.getElementById("preloader");
-                    preloader.style.opacity = "0";
+                    preloader.style.opacity = '0';
                     setTimeout(() => {
-                        preloader.style.display = "none";
-                        isAnimating = true;
-                        idleTimer = setTimeout(() => { isIdleSwirling = true; }, 3000);
-                        animate(); 
-                    }, 800); 
-                }, remaining);
-            });
-
-            function animate() {
-                if (!isAnimating) return;
-                time += 0.1;
-
-                if (isIdleSwirling) {
-                    idleTime += 0.025; 
-                    targetX = centerX + Math.sin(idleTime * 1.3) * (centerX * 0.6) + Math.sin(idleTime * 2.8) * (centerX * 0.2);
-                    targetY = centerY + Math.cos(idleTime * 0.9) * (centerY * 0.6) + Math.sin(idleTime * 2.1) * (centerY * 0.2);
-                    paraTargetX = ((targetX - centerX) / centerX) * 0.4;
-                    paraTargetY = ((targetY - centerY) / centerY) * 0.4;
-                    maskFadeMultiplier = lerp(maskFadeMultiplier, 1, 0.05);
-                } else {
-                    maskFadeMultiplier = lerp(maskFadeMultiplier, mouseActive ? 1 : 0, mouseActive ? 0.1 : 0.08);
-                }
-
-                let dx = targetX - currentX, dy = targetY - currentY;
-                let distance = Math.sqrt(dx*dx + dy*dy);
-                if (distance > 0) {
-                    let activeDist = distance > 30 ? 30 + Math.sqrt(distance - 30) * 8 : distance;
-                    currentX += (dx / distance) * activeDist * LAG_FACTOR;
-                    currentY += (dy / distance) * activeDist * LAG_FACTOR;
-                }
-
-                trail.unshift({ x: currentX, y: currentY, vel: distance });
-                if (trail.length > TRAIL_LENGTH) trail.pop();
-
-                let dynamicRadius = MAIN_RADIUS * Math.pow(maskFadeMultiplier, 0.5);
-                for (let i = 0; i < TRAIL_LENGTH; i++) {
-                    const circle = maskCircles[i];
-                    if (i < trail.length && maskFadeMultiplier > 0.01) {
-                        let point = trail[i], progress = i / TRAIL_LENGTH;
-                        let opacity = (Math.max(0, 1 - Math.pow(progress, 1.2)) * maskFadeMultiplier).toFixed(2);
-                        if (opacity < 0.02) { circle.setAttribute('r', '0'); continue; }
-                        
-                        let baseSize = dynamicRadius + (Math.min(point.vel * 0.8, 30));
-                        let ripple = Math.sin(i * 0.4 - time * 2) * (15 * (1 - progress));
-                        let size = Math.max(0, (baseSize * (1 - progress * 0.5)) + ripple).toFixed(1);
-                        
-                        let finalX = (point.x + Math.cos(i * 0.25 + time * 1.2) * (20 * progress)).toFixed(1);
-                        let finalY = (point.y + Math.sin(i * 0.3 - time * 1.5) * (20 * progress)).toFixed(1);
-
-                        circle.setAttribute('cx', finalX); circle.setAttribute('cy', finalY);
-                        circle.setAttribute('r', size); circle.setAttribute('opacity', opacity);
-                    } else {
-                        circle.setAttribute('r', '0');
-                    }
-                }
-
-                paraCurrentX = lerp(paraCurrentX, paraTargetX, 0.05);
-                paraCurrentY = lerp(paraCurrentY, paraTargetY, 0.05);
-
-                bgs.forEach(bg => bg.style.transform = `translate3d(${(paraCurrentX * -20).toFixed(1)}px, ${(paraCurrentY * -20).toFixed(1)}px, 0)`);
-                subjects.forEach(sub => sub.style.transform = `translate3d(${(paraCurrentX * 15).toFixed(1)}px, ${(paraCurrentY * 15).toFixed(1)}px, 0)`);
-                scrollWrappers.forEach(sw => sw.style.transform = `translate3d(${(paraCurrentX * 30).toFixed(1)}px, ${(paraCurrentY * 30).toFixed(1)}px, 0)`);
-
-                requestAnimationFrame(animate);
+                        preloader.remove();
+                    }, 600); // Matches CSS transition duration
+                }, 400); 
             }
+        });
+
+        // Handle Scroll Animations using Intersection Observer API
+        document.addEventListener("DOMContentLoaded", () => {
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px 0px -50px 0px', // Trigger slightly before it comes fully into view
+                threshold: 0.15
+            };
+
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        observer.unobserve(entry.target); // Only animate once
+                    }
+                });
+            }, observerOptions);
+
+            const animatableElements = document.querySelectorAll('.animate-on-scroll');
+            animatableElements.forEach(el => {
+                observer.observe(el);
+            });
         });
     </script>
 </body>
