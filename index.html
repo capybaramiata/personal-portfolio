@@ -111,6 +111,12 @@
         .float-anim {
             animation: float 6s ease-in-out infinite;
         }
+        
+        /* Float Delays */
+        .delay-1 { animation-delay: 0.5s; }
+        .delay-2 { animation-delay: 1.0s; }
+        .delay-3 { animation-delay: 1.5s; }
+        .delay-4 { animation-delay: 2.0s; }
 
         @keyframes subtleScale {
             0%, 100% { transform: scale(1); }
@@ -127,6 +133,16 @@
         .animate-on-scroll.visible {
             opacity: 1;
             transform: translateY(0);
+        }
+
+        /* Pop Animation for Big Text */
+        .animate-on-scroll.animate-pop {
+            transform: translateY(8vw) scale(0.9);
+            transition: opacity 0.8s ease-out, transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .animate-on-scroll.animate-pop.visible {
+            transform: translateY(0) scale(1);
         }
 
         /* Layout Utilities - Now purely fluid */
@@ -203,8 +219,8 @@
         .why-image {
             width: 220%;
             position: relative;
-            left: -12vw;
-            top: -4vw;
+            left: -24vw;
+            top: -10vw;
             z-index: 2;
         }
 
@@ -308,27 +324,27 @@
         <!-- But Why Section -->
         <section class="flex px-4 why-section mb-8 items-start animate-on-scroll">
             <div class="why-image-wrapper">
-                <img src="maxTwo.webp" alt="Max Shrugging" class="why-image">
+                <img src="maxTwo.webp" alt="Max Shrugging" class="why-image float-anim delay-1">
             </div>
             <div class="why-text-wrapper">
-                <h2 class="font-anton text-purple mb-2" style="font-size: 13vw;">BUT WHY?</h2>
+                <h2 class="font-anton text-purple mb-2 animate-on-scroll animate-pop" style="font-size: 13vw;">BUT WHY?</h2>
                 <p class="font-roboto text-magenta mb-4" style="font-size: 5vw;">
                     Dawson is an<br>
                     amazing school<br>
                     with toooons of<br>
                     opportunity...
                 </p>
-                <img src="andThatsGreat.webp" alt="AND THAT'S GREAT!" style="width: 100%; display: block; margin-top: 4vw; transform: rotate(-6deg);">
+                <img src="andThatsGreat.webp" alt="AND THAT'S GREAT!" class="float-anim delay-2" style="width: 100%; display: block; margin-top: 4vw; transform: rotate(-6deg);">
             </div>
         </section>
 
         <!-- The Catch Section -->
         <section class="px-4 text-center mb-8 animate-on-scroll">
-            <h2 class="font-anton text-purple mb-4" style="font-size: 15.5vw; line-height: 0.95;">
+            <h2 class="font-anton text-purple mb-4 animate-on-scroll animate-pop" style="font-size: 15.5vw; line-height: 0.95;">
                 ...SO WHAT'S<br>THE CATCH?
             </h2>
             <p class="font-roboto text-magenta mb-2" style="font-size: 5.8vw;">Right now, it feels</p>
-            <img src="impossible.webp" alt="IMPOSSIBLE" style="width: 88vw; margin: 0 auto 4vw auto; display: block; transform: rotate(-4deg);">
+            <img src="impossible.webp" alt="IMPOSSIBLE" class="float-anim delay-1" style="width: 98vw; margin: 0 auto 4vw auto; display: block; transform: rotate(-4deg);">
             <p class="font-roboto text-magenta mb-6" style="font-size: 5.8vw;">to actually find any of it.</p>
             <p class="font-roboto text-magenta" style="font-size: 5.2vw; margin: 0 4vw;">
                 Discovering basic info<br>
@@ -340,14 +356,14 @@
 
         <!-- That's Where I'd Come In -->
         <section class="px-4 thats-where-container mb-8 animate-on-scroll">
-            <h2 class="font-anton text-purple relative" style="font-size: 13vw; z-index: 3;">THAT'S WHERE</h2>
-            <img src="maxThree.webp" alt="Max Pointing to Self" class="circle-max">
-            <h2 class="font-anton text-purple text-right relative" style="font-size: 17vw; z-index: 3; margin-top: -3vw;">I'D<br>COME IN.</h2>
+            <h2 class="font-anton text-purple relative animate-on-scroll animate-pop" style="font-size: 13vw; z-index: 4; margin-bottom: -12vw;">THAT'S WHERE</h2>
+            <img src="maxThree.webp" alt="Max Pointing to Self" class="circle-max float-anim delay-2">
+            <h2 class="font-anton text-purple text-right relative animate-on-scroll animate-pop" style="font-size: 17vw; z-index: 3; margin-top: -3vw;">I'D<br>COME IN.</h2>
         </section>
 
         <!-- About Me Section -->
         <section class="px-4 mb-8">
-            <h2 class="font-anton text-purple mb-2 animate-on-scroll" style="font-size: 13vw; line-height: 0.95;">SOME<br>THINGS<br>ABOUT ME!</h2>
+            <h2 class="font-anton text-purple mb-2 animate-on-scroll animate-pop" style="font-size: 13vw; line-height: 0.95;">SOME<br>THINGS<br>ABOUT ME!</h2>
             
             <div class="about-me-grid">
                 <!-- Left Column -->
@@ -359,14 +375,14 @@
                         <p class="font-roboto text-magenta mb-2" style="font-size: 3.2vw;">
                             (and actually learned<br>how to make a website)
                         </p>
-                        <img src="roboticsSite.webp" alt="Robotics Website" class="w-full" style="border-radius: 1.5vw;">
+                        <img src="roboticsSite.webp" alt="Robotics Website" class="w-full float-anim delay-1" style="border-radius: 1.5vw;">
                     </div>
                     
                     <div class="animate-on-scroll">
                         <p class="font-roboto text-magenta mb-2" style="font-size: 4.2vw;">
                             I'm a photographer!<br>(shoutout<br><a href="https://instagram.com/pixwithmax" target="_blank" style="color: inherit; text-decoration: underline;">@pixwithmax</a>)
                         </p>
-                        <img src="maxFour.webp" alt="Max with Camera" style="width: 70%; margin: 0 auto; display: block;">
+                        <img src="maxFour.webp" alt="Max with Camera" class="float-anim delay-3" style="width: 135%; margin-left: -15%; margin-top: 2vw; display: block; position: relative; z-index: 2;">
                     </div>
                 </div>
 
@@ -377,8 +393,8 @@
                             I like to create niche<br>reels like these...
                         </p>
                         <div class="niche-reels-container">
-                            <img src="arrow.webp" alt="Arrow pointing" class="arrow-img">
-                            <img src="nicheReels.webp" alt="Niche Reels Example" style="width: 85%; margin-left: auto; display: block; border-radius: 1.5vw;">
+                            <img src="arrow.webp" alt="Arrow pointing" class="arrow-img float-anim delay-4">
+                            <img src="nicheReels.webp" alt="Niche Reels Example" class="float-anim delay-2" style="width: 85%; margin-left: auto; display: block; border-radius: 1.5vw;">
                         </div>
                     </div>
 
@@ -386,7 +402,7 @@
                         <p class="font-roboto text-magenta mb-2" style="font-size: 4.2vw;">
                             I managed my<br>school's meme<br>account :D
                         </p>
-                        <img src="softVemes.webp" alt="Meme Account" class="w-full" style="border-radius: 1.5vw;">
+                        <img src="softVemes.webp" alt="Meme Account" class="w-full float-anim delay-1" style="border-radius: 1.5vw;">
                         <p class="font-roboto text-magenta text-right mt-4" style="font-size: 2.8vw;">
                             (Also I have canva premium...<br>subtle flex ;))
                         </p>
@@ -397,7 +413,7 @@
 
         <!-- My Plans Section -->
         <section class="px-4 mb-8">
-            <h2 class="font-anton text-purple mb-6 animate-on-scroll" style="font-size: 14vw;">MY PLANS?</h2>
+            <h2 class="font-anton text-purple mb-6 animate-on-scroll animate-pop" style="font-size: 14vw;">MY PLANS?</h2>
 
             <div class="flex items-center gap-4 mb-6 animate-on-scroll">
                 <img src="laptop.webp" alt="Laptop Icon" class="float-anim" style="width: 22vw; object-fit: contain;">
@@ -428,7 +444,7 @@
 
         <!-- Interested / CTA Section -->
         <section class="px-4 text-center mt-4 pb-8 animate-on-scroll">
-            <img src="interested.webp" alt="INTERESTED?" style="width: 88vw; margin: 0 auto 4vw auto; display: block;">
+            <img src="interested.webp" alt="INTERESTED?" class="float-anim delay-2" style="width: 88vw; margin: 0 auto 4vw auto; display: block;">
             <p class="font-roboto text-purple mb-6" style="font-size: 5.5vw;">Check out my stuff!</p>
 
             <div class="flex justify-center items-end gap-2">
